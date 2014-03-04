@@ -1,0 +1,320 @@
+
+html, body {
+	height: 100%;
+}
+
+body {
+	font-size: 13px;
+}
+
+#topContainer {
+	width: 100%;
+	height:100%;
+	margin: auto;
+	background-size: contain;
+}
+
+
+#mrViceContainer {
+	position: relative;
+	height: 100%;
+	width: 1000px;
+	margin: auto;
+	background-color: rgb(206, 206, 206);
+}
+
+#pageHeader {
+	position:relative;
+	font-style:italic;
+	text-align:center;
+	width: 60%;
+	margin: auto;
+	height:5%;
+	
+	
+}
+
+
+#labels {
+	position:relative;
+	margin: auto;
+	width: 100%;
+	height: 5%;
+	min-height:30px;
+	font-size: 1.4em;
+}
+
+#chatLabel {
+	position:absolute;
+	width: 60%;
+	height: 100%;
+	margin: auto;
+	left: 0px;
+	right: 0px;
+	text-align: center;
+	font-size: 0.8em;
+	
+}
+
+
+
+#friendsLabel {
+	position:absolute;
+	width: 20%;
+	height: 100%;
+	right: 0px;
+	text-align: center;
+	
+}
+
+#conversationsLabel {
+	position:absolute;
+	width: 20%;
+	height: 100%;
+	left: 0px;
+	text-align: center;
+	
+}
+
+#mainContainer {
+	position: relative;
+	width: 100%;
+	height: 80%;
+	margin: auto;
+}
+
+#westSide {
+	position: absolute;
+	left: 0px;
+	height: 100%;
+	width: 20%;
+}
+
+#conversationList {
+	position: relative;
+	left:0px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height:70%;
+	width:200px;
+
+}
+
+#utilityBox {
+
+	position: relative;
+	height:30%;
+	width:100%;
+}
+
+.conversation {
+	height: 60px;
+	line-height: 60px;
+	position: relative;
+	padding-left: 20px;
+	width: 180px;
+	cursor: pointer;
+	word-wrap: break-word;
+
+}
+
+
+
+
+.conversationPassive {
+}
+
+.conversationActive {	
+	background-color: aliceblue;
+}
+
+
+#chatContainer {
+	position:absolute;
+	top:0px;
+	left:0px;
+	right:0px;
+	bottom:0px;
+	margin: auto;
+	width:60%;
+	height:100%;
+}
+
+
+#videoContainer {
+	position: relative;
+	width: 100%;
+}
+
+.videoHidden {
+	height: 0%;
+}
+.videoShown {
+	height: 50%;
+}
+	
+
+#videoSelf {
+	position:absolute;
+	left:0px;
+	width:50%;
+	margin:auto;
+}
+#videoCaller {
+	position:absolute;
+	right:0px;
+	width:50%;
+	margin:auto;
+}
+
+#chatArea {
+	position:relative;
+	overflow-y: auto;
+	overflow-x: hidden;
+	word-wrap: break-word;
+	width: 100%;	
+}
+
+#sendMessageContainer, #bottom, #pageHeader, #chatLabel, #chatContainer, #chatArea, #bottomMid, #videoContainer {
+	background-color: darkgrey;
+}
+
+.largeChat {
+	height: 92%;
+}
+
+.smallChat {
+	height: 40%;
+}
+
+.chatMessage {
+	padding: 10px 20px 0px 20px;
+	font-size: 1em;
+}
+
+#sendMessageContainer {
+	position:absolute;
+	width: 100%;
+	height: 7%;
+	bottom: 0px;
+	border: 0px;
+	
+}
+
+#sendMessageField {
+	position: absolute;
+    top:0px;
+    bottom: 0px;
+    left: 0px;
+	right: 0px;
+	width:99%;
+	min-height:20px;
+	border: 0px;
+    margin: auto;
+}
+
+#sendMessageButton {
+	position: absolute;
+    top:0;
+    bottom: 0;
+
+    right: 4px;
+	margin: auto;
+	height:20px;
+	width: 8%;
+}
+
+#friendList {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	width: 20%;
+	height: 100%;
+	
+	font-size: 1.1em;
+	
+}
+
+.friend {
+	position: relative;
+	vertical-align: middle;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	cursor: pointer;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	
+}
+
+.friendText {
+	padding-left: 20px;
+	line-height: 100%;
+	word-break: break-all;
+
+	height:100%;
+
+}
+
+.friend:hover, .conversationPassive:hover {
+	background-color: darkgray;
+}
+
+button {
+	position:relative;
+	vertical-align: middle;
+}
+
+#bottom {
+	position:relative;
+	height: 10%;
+	width: 100%;
+	margin: auto;
+}
+
+#bottomMid {
+	position: absolute;
+	left:0px;
+	right:0px;
+	height:100%;
+	width:60%;
+	margin:auto;
+}
+
+#bottomLeft {
+	left:0px;	
+}
+
+#bottomRight {
+	right:0px;	
+}
+
+#bottomLeft, #bottomRight {
+	position: absolute;
+	height:100%;
+	width:20%;
+	background-color: rgb(206, 206, 206)
+}
+
+
+body {
+	font-family: Arial,sans-serif;
+	line-height: 170%;
+	color: rgb(75,75,75);
+	margin: auto;
+}
+
+p.header {
+	font-size: 1.8em;
+}
+
+p.subHeader {
+	font-size: 1.5em;
+}
+
+.bold {
+	font-size: 1.1em;
+	font-weight: bold;
+}

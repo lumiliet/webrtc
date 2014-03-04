@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="main.css">
+	<script type="text/javascript" src="js/startup.js"></script>
+	<script type="text/javascript" src="js/GUI.js"></script>
+	<script type="text/javascript" src="js/controller.js"></script>
+	<script type="text/javascript" src="js/conversations.js"></script>
+	
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+	
+	<meta charset="utf-8" />
+	
+    
+</head>
+<body onload="start()">
+	<div id="topContainer">
+		<div id="mrViceContainer">
+			<div id="pageHeader"></div>
+			<div id="labels">		
+				<div id="chatLabel"></div>
+				<div id="friendsLabel">Friends online</div>
+				<div id="conversationsLabel">History</div>
+			</div>
+	
+			<div id="mainContainer">
+			
+				<div id="westSide"> 
+					<div id="conversationList"></div>
+					<div id="utilityBox">
+						
+					</div>
+				</div>
+				<div id="chatContainer">
+				
+				
+					<div id="videoContainer" class="videoHidden">
+						<video id="videoSelf"></video>
+						<video id="videoCaller"></video>
+					</div>
+					<div id="chatArea" class="largeChat">
+					
+					</div>
+					<div id="sendMessageContainer">
+						<input type="text" id="sendMessageField">
+						<!--<button id="sendMessageButton">Send</button>-->
+					</div>
+				
+				</div>
+				<div id="friendList"></div>
+				
+			</div>
+			<div id="bottom">
+				<div id="bottomLeft"></div>
+				<div id="bottomMid"></div>
+				<div id="bottomRight"></div>
+			</div>
+			
+		</div>
+	</div>
+</body>
+</html>
