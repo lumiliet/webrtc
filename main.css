@@ -107,6 +107,24 @@ body {
 	width:100%;
 }
 
+#newGroupConversation {
+	position: absolute;
+	width:60%;
+	right: 0px;
+	left: 0px;
+	bottom: 40px;
+	margin: auto;
+}
+#friendSelectMode {
+	position: absolute;
+	width:60%;
+	right: 0px;
+	left: 0px;
+	bottom: 0px;
+	margin: auto;
+}
+
+
 .conversation {
 	height: 60px;
 	line-height: 60px;
@@ -114,6 +132,7 @@ body {
 	padding-left: 20px;
 	width: 180px;
 	cursor: pointer;
+	overflow-y: hidden;
 	word-wrap: break-word;
 
 }

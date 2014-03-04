@@ -13,10 +13,20 @@ GUI.setup = function() {
 		}
 	}
 	
+	document.onkeyup = controller.documentKeyListener;
+	
+	var newGroupConversationButton = document.getElementById("newGroupConversation");
+	newGroupConversationButton.onclick = controller.newGroupConversation;
+	
+	var friendSelectModeButton = document.getElementById("friendSelectMode");
+	friendSelectModeButton.onclick = controller.friendSelectModeListener;
+	
+	
 	messageField.focus();
 	
 	document.title = GUI.documentTitle;
-	
+	GUI.setButtonText("friendSelectMode", "Add friends to the conversation");
+
 	window.onblur = function() {
 		GUI.focus = false;
 	};
@@ -24,6 +34,16 @@ GUI.setup = function() {
 		GUI.focus = true;
 		GUI.notification("", true);
 	};
+}
+
+GUI.setButtonDisabled = function(id, on) {
+	var button = document.getElementById(id);
+	button.disabled = on;
+}
+
+GUI.setButtonText = function(id, text) {
+	var button = document.getElementById(id);
+	button.innerHTML = text;
 }
 
 GUI.writeHTMLToChat = function(html) {
@@ -82,6 +102,8 @@ GUI.updateConversationList = function(list) {
 		
 		conversationList.appendChild(conversation);
 	}
+	
+	
 }
 
 GUI.updateFriendList = function(friends) {
@@ -102,7 +124,7 @@ GUI.updateFriendList = function(friends) {
 
 		friend.onclick = function(id) {
 			return function() {
-				controller.setCurrentConversation(id);
+				controller.friendClickListener(id);
 			}
 		}(id);
 		

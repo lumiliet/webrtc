@@ -13,7 +13,9 @@ function start() {
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
-	easyrtc.connect("chat");
+	easyrtc.connect("chat", function(id) {
+		controller.id = id;
+	});
 	
 	easyrtc.setStreamAcceptor(controller.acceptor);
 	easyrtc.setOnStreamClosed(controller.disconnectListener);
