@@ -1,2 +1,2 @@
-webrtc
+Basic chat using Easyrtc
 ======
