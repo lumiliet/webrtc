@@ -26,7 +26,7 @@ controller.updateGUI = function() {
 
 controller.receiveMessage = function(id, msgType, message) {	
 	conversations.addMessageToConversation(id, message);
-	if (id !== conversations.getCurrentConversationId()) GUI.notification(easyrtc.idToName(id));
+	GUI.notification(easyrtc.idToName(id));
 	controller.updateGUI();
 }
 
