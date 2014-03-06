@@ -5,7 +5,7 @@ function start() {
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(true);
-	easyrtc.enableAudio(false);
+	easyrtc.enableAudio(true);
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
@@ -20,6 +20,10 @@ function start() {
 			console.log("failed to connect ", erFrText);
 		}
 	);
+	
+	easyrtc.setDataChannelOpenListener( function(easyrtcid){
+		easyrtc.sendDataP2P(easyrtcid, "message", "hello");
+	});
 
 	GUI.setup();
 }

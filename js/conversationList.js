@@ -1,10 +1,10 @@
-var conversations = {
+var conversationList = {
 	list: {},
 	multiCounter: 0,
 	currentConversationId: ""
 }
 
-conversations.newConversation = function(id, multi) {	
+conversationList.newConversation = function(id, multi) {	
 	if (this.list[id]) return;
 	if (typeof(id) !== "string") return;
 	
@@ -34,7 +34,7 @@ conversations.newConversation = function(id, multi) {
 			if (this.participants.length) {
 				out += "Group: ";
 				for (var i = 0; i < this.participants.length; i++) {
-					out += conversations.get(this.participants[i]).username;
+					out += conversationList.get(this.participants[i]).username;
 					if (i !== (this.participants.length -1)) out += ", ";
 				}
 			}
@@ -54,8 +54,8 @@ conversations.newConversation = function(id, multi) {
 			if (this.participants.length) {
 				out += "You are talking to ";
 				for (var i = 0; i < this.participants.length; i++) {
-					out += conversations.get(this.participants[i]).username;
-					if (!conversations.get(this.participants[i]).online) out += " (offline)";
+					out += conversationList.get(this.participants[i]).username;
+					if (!conversationList.get(this.participants[i]).online) out += " (offline)";
 					if (i !== (this.participants.length -1)) out += ", ";
 				}
 			}
@@ -78,7 +78,7 @@ conversations.newConversation = function(id, multi) {
 	}
 }
 
-conversations.newGroupConversation = function(conversationId) {
+conversationList.newGroupConversation = function(conversationId) {
 	var id;
 	if (conversationId) id = conversationId;
 	else id = controller.id + "_" +  this.multiCounter++;
@@ -87,7 +87,7 @@ conversations.newGroupConversation = function(conversationId) {
 	return this.list[id];
 }
 
-conversations.conversationListener = function(id, participants) {
+conversationList.conversationListener = function(id, participants) {
 	if (!this.get(id)) {
 		this.newGroupConversation(id);
 	}
@@ -97,29 +97,29 @@ conversations.conversationListener = function(id, participants) {
 }
 
 
-conversations.addIdToGroup = function(id, groupid) {
+conversationList.addIdToGroup = function(id, groupid) {
 	this.get(groupid).participants.push(id);
 }
 
-conversations.get = function(id) {
+conversationList.get = function(id) {
 	if (this.list[id]) return this.list[id];
 }
 
-conversations.getAll = function() {
+conversationList.getAll = function() {
 	return this.list;
 }
 
-conversations.getCurrentConversation = function() {
+conversationList.getCurrentConversation = function() {
 	if (this.currentConversationId) {
 		return this.get(this.currentConversationId);
 	}
 }
 
-conversations.getCurrentConversationId = function() {
+conversationList.getCurrentConversationId = function() {
 	return this.currentConversationId;	
 }
 
-conversations.setCurrentConversation = function(id) {
+conversationList.setCurrentConversation = function(id) {
 	if (this.list[this.currentConversationId]) this.list[this.currentConversationId].active = false;
 	if (this.list[id]) {
 		this.list[id].active = true;
@@ -132,19 +132,19 @@ conversations.setCurrentConversation = function(id) {
 	this.list[id].unseen = 0;
 }
 
-conversations.updateFriends = function(friends) {
+conversationList.updateFriends = function(friends) {
 	for (var id in friends) {
 		if (!this.list[id]) this.newConversation(id);
 	}
 }
 
-conversations.addHTML = function(id, html) {
+conversationList.addHTML = function(id, html) {
 	this.list[id].html += html;
 	this.list[id].visible = true;
 	if (!this.list[id].active) this.list[id].unseen++;
 }
 
-conversations.generateMessageHTML = function(id, message) {
+conversationList.generateMessageHTML = function(id, message) {
 	var messageLabel = document.createElement("div");
 	messageLabel.className = "chatMessage";
 	
@@ -163,7 +163,7 @@ conversations.generateMessageHTML = function(id, message) {
 }
 
 
-conversations.updateOnlineFriends = function(friends) {
+conversationList.updateOnlineFriends = function(friends) {
 	for (var id in this.list) {
 		if (!this.list[id].multi) this.list[id].online = false;
 	}

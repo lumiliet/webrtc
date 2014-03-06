@@ -4,22 +4,22 @@ var controller = {
 }
 
 controller.setCurrentConversation = function(id) {
-	conversations.setCurrentConversation(id);
+	conversationList.setCurrentConversation(id);
 	controller.updateGUI();
 }
 
 controller.updateGUI = function() {
 	GUI.cleanChat();
 	
-	if (conversations.getCurrentConversationId()) {
-		GUI.writeHTMLToChat(conversations.getCurrentConversation().html);
-		if (conversations.getCurrentConversation().multi) GUI.setButtonDisabled("friendSelectMode", false);
+	if (conversationList.getCurrentConversationId()) {
+		GUI.writeHTMLToChat(conversationList.getCurrentConversation().html);
+		if (conversationList.getCurrentConversation().multi) GUI.setButtonDisabled("friendSelectMode", false);
 		else GUI.setButtonDisabled("friendSelectMode", true);
 	}
-	GUI.updateConversationList(conversations.getAll());
+	GUI.updateConversationList(conversationList.getAll());
 	var text = "";
-	if (conversations.getCurrentConversation()) {	
-		text += conversations.getCurrentConversation().toStringTitle();
+	if (conversationList.getCurrentConversation()) {	
+		text += conversationList.getCurrentConversation().toStringTitle();
 	}
 	else {
 		text += "";
@@ -31,14 +31,14 @@ controller.updateGUI = function() {
 controller.receiveMessage = function(id, msgType, message) {
 	if (msgType === "message") {	
 		controller.addMessageToConversation(id, message);
-		GUI.notification(conversations.get(id).username);
+		GUI.notification(conversationList.get(id).username);
 	}
 	else if (msgType === "roomInvite") {
-		if (!conversations.get(message)) easyrtc.joinRoom(message);
+		if (!conversationList.get(message)) easyrtc.joinRoom(message);
 	}
 	else {
-		if (conversations.get(msgType)) {
-			GUI.notification(conversations.get(id).username);
+		if (conversationList.get(msgType)) {
+			GUI.notification(conversationList.get(id).username);
 			controller.addMessageToConversation(id, message, msgType)
 		}
 	}
@@ -46,27 +46,27 @@ controller.receiveMessage = function(id, msgType, message) {
 }
 
 controller.addMessageToConversation = function(sender, message, conversation) {
-	var html = conversations.generateMessageHTML(sender, message);
-	conversations.addHTML((conversation ? conversation : sender), html);
+	var html = conversationList.generateMessageHTML(sender, message);
+	conversationList.addHTML((conversation ? conversation : sender), html);
 }
 
 controller.sendMessage = function() {
 	var message = GUI.getTextFromMessageField();
 	
-	if (!message.length || !conversations.getCurrentConversationId() || !conversations.getCurrentConversation().online) return;
+	if (!message.length || !conversationList.getCurrentConversationId() || !conversationList.getCurrentConversation().online) return;
 	
 	GUI.cleanMessageField();
 	
-	if (conversations.getCurrentConversation().multi) {
-		var participants = conversations.getCurrentConversation().participants
+	if (conversationList.getCurrentConversation().multi) {
+		var participants = conversationList.getCurrentConversation().participants
 		for (var i in participants) {
-			easyrtc.sendData(participants[i], conversations.getCurrentConversationId(), message);
+			easyrtc.sendData(participants[i], conversationList.getCurrentConversationId(), message);
 		}
 	}
 	else {
-		easyrtc.sendData(conversations.getCurrentConversationId(), "message", message);
+		easyrtc.sendData(conversationList.getCurrentConversationId(), "message", message);
 	}
-	controller.addMessageToConversation(conversations.getCurrentConversationId(), message);
+	controller.addMessageToConversation(conversationList.getCurrentConversationId(), message);
 	controller.updateGUI();
 }
 
@@ -74,18 +74,18 @@ controller.sendMessage = function() {
 controller.roomListener = function(roomName, friends) {
 	if (roomName === "default") {
 		GUI.updateFriendList(friends);
-		conversations.updateOnlineFriends(friends);
+		conversationList.updateOnlineFriends(friends);
 		controller.updateGUI();
 	}
 	else {
-		conversations.conversationListener(roomName, friends);
+		conversationList.conversationListener(roomName, friends);
 	}
-	conversations.updateFriends(friends);
+	conversationList.updateFriends(friends);
 	controller.updateGUI();
 }
 
 controller.newGroupConversation = function() {
-	var groupConversation = conversations.newGroupConversation();
+	var groupConversation = conversationList.newGroupConversation();
 	easyrtc.joinRoom(groupConversation.id);	
 	controller.updateGUI();
 }
@@ -112,7 +112,7 @@ controller.inviteFriendToRoom = function(id, room) {
 
 controller.friendClickListener = function(id) {
 	if (controller.friendSelectMode) {
-		var current = conversations.getCurrentConversation();
+		var current = conversationList.getCurrentConversation();
 		if (current && current.multi) {
 			controller.inviteFriendToRoom(id, current.id);
 		}
@@ -123,7 +123,7 @@ controller.friendClickListener = function(id) {
 
 
 controller.friendSelectModeListener = function() {
-	var current = conversations.getCurrentConversation();
+	var current = conversationList.getCurrentConversation();
 	if (!controller.friendSelectMode) {
 		if (current && current.multi) {
 			controller.setFriendSelectMode(true);
