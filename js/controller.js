@@ -34,11 +34,8 @@ controller.sendMessage = function() {
 	
 	GUI.cleanMessageField();
 	
-	if (conversationList.getCurrent().data) {
-		easyrtc.sendData(conversationList.getCurrentId(), "dataChannel", message);
-		
-	}
-	else if (conversationList.getCurrent().multi) {
+	
+	if (conversationList.getCurrent().multi) {
 		var participants = conversationList.getCurrent().participants
 		for (var i in participants) {
 			easyrtc.sendData(participants[i], conversationList.getCurrentId(), message);
@@ -52,10 +49,6 @@ controller.sendMessage = function() {
 }
 
 controller.receiveMessage = function(id, msgType, message) {
-	if (msgType === "dataChannel") {
-		console.log("Received from data channel: " + message);
-		for (var i in message) console.log(i);
-	}
 	if (msgType === "message") {	
 		controller.addMessageToConversation(id, message);
 		GUI.notification(conversationList.get(id).username);
@@ -86,6 +79,10 @@ controller.newGroupConversation = function() {
 controller.setFriendSelectMode = function(enable) {
 	controller.friendSelectMode = enable;
 	console.log("Friend select mode " + (enable? "activated" : "deactivated"));
+	if (!enable) GUI.setButtonText("friendSelectMode", "Add friends to the conversation");
+	else GUI.setButtonText("friendSelectMode", "Stop adding friends");
+	controller.updateGUI();
+	
 }
 
 controller.inviteFriendToRoom = function(id, room) {
@@ -117,3 +114,6 @@ controller.call = function() {
 		easyrtc.hangup(conversationList.getCurrentId());
 	}
 }
+
+
+

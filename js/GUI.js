@@ -18,6 +18,10 @@ GUI.setup = function() {
 		controller.call();
 	}
 	
+    var files = document.getElementById('files');
+	files.onchange = function() {
+		fileTransfer.sendFiles();
+	};
 	
 	document.onkeyup = controller.documentKeyListener;
 	

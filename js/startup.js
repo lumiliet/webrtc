@@ -16,13 +16,15 @@ function start() {
 		function(easyrtcid, roomOwner){
 			if( roomOwner){ console.log("I'm the room owner"); }
 			console.log("my id is " + easyrtcid);
+			
 		},
 		function(errorText){
 			console.log("failed to connect ", erFrText);
 		}
 	);
 	
-	easyrtc.setDataChannelOpenListener(controller.dataChannelListener);
+	easyrtc.setDataChannelOpenListener(controller.dataChannelOpenListener);
+	easyrtc.setDataChannelCloseListener(controller.dataChannelCloseListener);
 	
 	/*
 	easyrtc.initMediaSource(function(){
@@ -31,6 +33,9 @@ function start() {
 		easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
 	});
 	*/
+	
+	fileTransfer.startup();
+	
 
 	GUI.setup();
 }
