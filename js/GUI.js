@@ -18,10 +18,13 @@ GUI.setup = function() {
 		controller.call();
 	}
 	
-    var files = document.getElementById('files');
-	files.onchange = function() {
-		fileTransfer.sendFiles();
-	};
+	
+    var sendFile = document.getElementById("sendFile");
+	sendFile.addEventListener("change", fileTransfer.sendFileChangeListener);
+	
+    var dropZone = document.getElementById('chatArea');
+    dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
+    dropZone.addEventListener('drop', fileTransfer.handleDrop);
 	
 	document.onkeyup = controller.documentKeyListener;
 	
@@ -46,9 +49,9 @@ GUI.setup = function() {
 	};
 }
 
-GUI.setButtonDisabled = function(id, on) {
+GUI.setButtonDisabled = function(id, disabled) {
 	var button = document.getElementById(id);
-	button.disabled = on;
+	button.disabled = disabled;
 }
 
 GUI.setButtonText = function(id, text) {

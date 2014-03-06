@@ -1,14 +1,4 @@
 
-controller.dataChannelOpenListener = function(id){
-	console.log("Data channel established " + id);
-	conversationList.get(id).data = true;
-}
-
-controller.dataChannelCloseListener = function(id) {
-	console.log("Data channel closed " + id);
-	conversationList.get(id).data = false;
-}
-
 controller.acceptor = function(id, stream) {
 	if (controller.localVideo.enabled) return;
 	

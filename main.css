@@ -101,29 +101,40 @@ body {
 }
 
 #utilityBox {
-
 	position: relative;
 	height:30%;
+	min-height: 110px;
 	width:100%;
 }
 
-#newGroupConversation {
-	position: absolute;
+#buttonContainer {
+	position: relative;
 	width:60%;
-	right: 0px;
+	top: 0px;
 	left: 0px;
-	bottom: 40px;
-	margin: auto;
-}
-#friendSelectMode {
-	position: absolute;
-	width:60%;
 	right: 0px;
-	left: 0px;
-	bottom: 0px;
-	margin: auto;
+	height:90px;
+	margin:auto;
 }
 
+#newGroupConversation {
+	position: relative;
+	width: 100%;
+	height:40px;
+
+}
+#friendSelectMode {
+	position: relative;
+	width: 100%;
+	height:40px;
+
+}
+#sendFile {
+	position: relative;
+	width: 80%;
+	left: 20px;
+	height:20px;
+}
 
 .conversation {
 	height: 60px;
@@ -136,9 +147,6 @@ body {
 	word-wrap: break-word;
 
 }
-
-
-
 
 .conversationPassive {
 }

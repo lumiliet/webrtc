@@ -15,6 +15,12 @@ controller.updateGUI = function() {
 		GUI.writeHTMLToChat(conversationList.getCurrent().html);
 		if (conversationList.getCurrent().multi) GUI.setButtonDisabled("friendSelectMode", false);
 		else GUI.setButtonDisabled("friendSelectMode", true);
+		
+		if (conversationList.getCurrent().data) {
+			console.log("data");
+			GUI.setButtonDisabled("sendFile", false);
+		}
+		else GUI.setButtonDisabled("sendFile", true);
 	}
 	GUI.updateConversationList(conversationList.getAll());
 	var text = "";
@@ -24,6 +30,8 @@ controller.updateGUI = function() {
 	else {
 		text += "";
 	}
+	
+	
 	GUI.setChatLabel(text);	
 }
 

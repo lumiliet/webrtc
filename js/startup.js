@@ -2,6 +2,7 @@ function start() {
 	
 	var username = location.search && location.search.split('?')[1];
 	
+	if (username === "Marius") document.getElementById("sendFile").hidden = true;
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(false);

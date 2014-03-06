@@ -32,8 +32,12 @@
 				<div id="westSide"> 
 					<div id="conversationList"></div>
 					<div id="utilityBox">
-						<button id="newGroupConversation">New group conversation</button>
-						<button id="friendSelectMode" disabled=true></button>
+						<div id="buttonContainer">
+							<button id="newGroupConversation">New group conversation</button>
+							<button id="friendSelectMode" disabled=true></button>
+							
+						</div>
+						<input type="file" id="sendFile" disabled=true>
 					</div>
 				</div>
 				<div id="chatContainer">
@@ -48,7 +52,6 @@
 					</div>
 					<div id="sendMessageContainer">
 						<input type="text" id="sendMessageField">
-						<!--<button id="sendMessageButton">Send</button>-->
 					</div>
 				
 				</div>
@@ -63,8 +66,8 @@
 			
 		</div>
 	</div>
-	<input type="file" id="files" style="min-height: 20px; padding-top: 5px">
-	<output id="list"></output>
+	
+
 
 </body>
 </html>
