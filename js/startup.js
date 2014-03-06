@@ -4,7 +4,7 @@ function start() {
 	
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
-	easyrtc.enableVideo(true);
+	easyrtc.enableVideo(false);
 	easyrtc.enableAudio(true);
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
@@ -24,6 +24,14 @@ function start() {
 	easyrtc.setDataChannelOpenListener( function(easyrtcid){
 		easyrtc.sendDataP2P(easyrtcid, "message", "hello");
 	});
+	
+	/*
+	easyrtc.initMediaSource(function(){
+		var videoSelf = document.getElementById("videoSelf");
+		controller.localVideo.stream = easyrtc.getLocalStream();
+		easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
+	});
+	*/
 
 	GUI.setup();
 }

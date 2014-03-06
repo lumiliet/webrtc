@@ -139,3 +139,92 @@ controller.friendSelectModeListener = function() {
 }
 
 
+
+controller.call = function() {
+	if (!conversations.getCurrentConversationId()) return;
+	
+	if (!conversations.getCurrentConversation().video) {
+		console.log("YO");
+		/*
+		easyrtc.call(conversations.getCurrentConversationId(),
+			function(otherCaller, mediaType) {
+				console.log("Call succesful - " + otherCaller + " - " + mediaType);
+			},
+			function(errorCode, errMessage) {
+				console.log("Call failed - " + errorCode + " - " + errMessage);
+			}
+		);
+		
+		*/
+		easyrtc.call( conversations.getCurrentConversationId(),
+		       function(easyrtcid, mediaType){
+		          console.log("Got mediatype " + mediaType + " from " + easyrtc.idToName(easyrtcid));
+		       },
+		       function(errorCode, errMessage){
+		          console.log("call to  " + easyrtc.idToName(otherEasyrtcid) + " failed:" + errMessage);
+		       },
+		       function(wasAccepted, easyrtcid){
+		           if( wasAccepted ){
+		              console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+		           }
+		           else{
+		               console.log("call rejected" + easyrtc.idToName(easyrtcid));
+		           }
+		       });
+	}
+	else {
+		easyrtc.hangup(conversations.getCurrentConversationId());
+	}
+}
+
+controller.acceptor = function(id, stream) {
+	if (controller.localVideo.enabled) return;
+	
+	controller.setCurrentConversation(id);
+	
+	controller.localVideo.stream = easyrtc.getLocalStream();
+	controller.localVideo.enabled = true;
+	
+	conversations.get(id).stream = stream;
+	conversations.get(id).video = true;
+	
+	var videoSelf = document.getElementById("videoSelf");
+	var videoCaller = document.getElementById("videoCaller");
+	easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
+	easyrtc.setVideoObjectSrc(videoCaller, stream);
+	
+	GUI.toggleVideo(true);
+	var currentdate = new Date(); 
+	var datetime = "Call started: " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+	conversations.addMessageToConversation("", datetime);
+	controller.updateGUI();
+}
+
+controller.disconnectListener = function(id) {
+	if (!controller.localVideo.enabled) return;
+	
+	//controller.localVideo.stream.stop();
+	controller.localVideo.stream = {};
+	controller.localVideo.enabled = false;
+	
+	conversations.get(id).stream = {};
+	conversations.get(id).video = false;
+	
+	GUI.toggleVideo(false);
+	var currentdate = new Date(); 
+	var datetime = "Call ended: " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+	conversations.addMessageToConversation("", datetime);
+	controller.updateGUI();
+	
+}
+
+
+
+var acceptor = function(input) {
+	return input;
+}
+
+controller.acceptChecker = function(id, acceptor){
+	if (!controller.videoConnected) acceptor(confirm("Accept call from " + easyrtc.idToName(id)));
+	else acceptor(false);
+}
