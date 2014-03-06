@@ -16,7 +16,7 @@ controller.updateGUI = function() {
 		if (conversationList.getCurrent().multi) GUI.setButtonDisabled("friendSelectMode", false);
 		else GUI.setButtonDisabled("friendSelectMode", true);
 		
-		if (conversationList.getCurrent().data) {
+		if (conversationList.getCurrent().data && conversationList.getCurrent().online) {
 			console.log("data");
 			GUI.setButtonDisabled("sendFile", false);
 		}
@@ -122,6 +122,15 @@ controller.call = function() {
 		easyrtc.hangup(conversationList.getCurrentId());
 	}
 }
+
+
+/* TODO use this for something
+easyrtc.initMediaSource(function(){
+	var videoSelf = document.getElementById("videoSelf");
+	controller.localVideo.stream = easyrtc.getLocalStream();
+	easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
+});
+*/
 
 
 

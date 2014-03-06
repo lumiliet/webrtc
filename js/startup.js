@@ -2,7 +2,6 @@ function start() {
 	
 	var username = location.search && location.search.split('?')[1];
 	
-	if (username === "Marius") document.getElementById("sendFile").hidden = true;
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(false);
@@ -26,14 +25,6 @@ function start() {
 	
 	easyrtc.setDataChannelOpenListener(controller.dataChannelOpenListener);
 	easyrtc.setDataChannelCloseListener(controller.dataChannelCloseListener);
-	
-	/*
-	easyrtc.initMediaSource(function(){
-		var videoSelf = document.getElementById("videoSelf");
-		controller.localVideo.stream = easyrtc.getLocalStream();
-		easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
-	});
-	*/
 	
 	fileTransfer.startup();
 	

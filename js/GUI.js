@@ -13,8 +13,8 @@ GUI.setup = function() {
 		}
 	}
 	
-	var chatLabel = document.getElementById("chatLabel");
-	chatLabel.onclick = function(e) {
+	var midLabel = document.getElementById("midLabel");
+	midLabel.onclick = function(e) {
 		controller.call();
 	}
 	
@@ -89,7 +89,7 @@ GUI.notification = function(name, reset) {
 }
 
 GUI.setChatLabel = function(text) {
-	var chatLabel = document.getElementById("chatLabel");
+	var chatLabel = document.getElementById("midLabel");
 	chatLabel.innerHTML = text;
 }
 

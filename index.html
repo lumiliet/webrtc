@@ -20,54 +20,38 @@
 <body onload="start()">
 	<div id="topContainer">
 		<div id="mrViceContainer">
-			<div id="pageHeader"></div>
-			<div id="labels">		
-				<div id="chatLabel"></div>
-				<div id="friendsLabel">Friends online</div>
-				<div id="conversationsLabel">History</div>
-			</div>
-	
-			<div id="mainContainer">
-			
+			<div id="west">
+				<div id="leftLabel">History</div>
 				<div id="westSide"> 
 					<div id="conversationList"></div>
 					<div id="utilityBox">
 						<div id="buttonContainer">
 							<button id="newGroupConversation">New group conversation</button>
-							<button id="friendSelectMode" disabled=true></button>
-							
+							<button id="friendSelectMode" disabled=true></button>		
 						</div>
 						<input type="file" id="sendFile" disabled=true>
 					</div>
 				</div>
+			</div>
+			<div id="mid">
+				<div id="midLabel"></div>
 				<div id="chatContainer">
-				
-				
 					<div id="videoContainer" class="videoHidden">
 						<video id="videoSelf"></video>
 						<video id="videoCaller"></video>
 					</div>
 					<div id="chatArea" class="largeChat">
-					
 					</div>
 					<div id="sendMessageContainer">
 						<input type="text" id="sendMessageField">
 					</div>
-				
 				</div>
+			</div>			
+			<div id="east">
+				<div id="rightLabel">Friends online</div>
 				<div id="friendList"></div>
-				
 			</div>
-			<div id="bottom">
-				<div id="bottomLeft"></div>
-				<div id="bottomMid"></div>
-				<div id="bottomRight"></div>
-			</div>
-			
 		</div>
 	</div>
-	
-
-
 </body>
 </html>
