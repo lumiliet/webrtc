@@ -1,10 +1,10 @@
 var conversationList = {
 	list: {},
 	multiCounter: 0,
-	currentConversationId: ""
+	currentId: ""
 }
 
-conversationList.newConversation = function(id, multi) {	
+conversationList.new = function(id, multi) {	
 	if (this.list[id]) return;
 	if (typeof(id) !== "string") return;
 	
@@ -16,6 +16,7 @@ conversationList.newConversation = function(id, multi) {
 		unseen: 0,
 		audio: false,
 		video: false,
+		data: false,
 		stream: {},
 		visible: false,
 		online: true,
@@ -82,7 +83,7 @@ conversationList.newGroupConversation = function(conversationId) {
 	var id;
 	if (conversationId) id = conversationId;
 	else id = controller.id + "_" +  this.multiCounter++;
-	this.newConversation(id, true);
+	this.new(id, true);
 	this.list[id].visible = true;
 	return this.list[id];
 }
@@ -109,32 +110,32 @@ conversationList.getAll = function() {
 	return this.list;
 }
 
-conversationList.getCurrentConversation = function() {
-	if (this.currentConversationId) {
-		return this.get(this.currentConversationId);
+conversationList.getCurrent = function() {
+	if (this.currentId) {
+		return this.get(this.currentId);
 	}
 }
 
-conversationList.getCurrentConversationId = function() {
-	return this.currentConversationId;	
+conversationList.getCurrentId = function() {
+	return this.currentId;	
 }
 
-conversationList.setCurrentConversation = function(id) {
-	if (this.list[this.currentConversationId]) this.list[this.currentConversationId].active = false;
+conversationList.setCurrent = function(id) {
+	if (this.list[this.currentId]) this.list[this.currentId].active = false;
 	if (this.list[id]) {
 		this.list[id].active = true;
 	}
 	else {
-		this.newConversation(id);
+		this.new(id);
 		this.list[id].active = true;
 	}
-	this.currentConversationId = id;
+	this.currentId = id;
 	this.list[id].unseen = 0;
 }
 
 conversationList.updateFriends = function(friends) {
 	for (var id in friends) {
-		if (!this.list[id]) this.newConversation(id);
+		if (!this.list[id]) this.new(id);
 	}
 }
 
@@ -151,9 +152,9 @@ conversationList.generateMessageHTML = function(id, message) {
 	var senderSpan = document.createElement("span");
 	senderSpan.className = "bold";
 	
-	if (id === this.currentConversationId) senderSpan.innerHTML += "Me: ";
+	if (id === this.currentId) senderSpan.innerHTML += "Me: ";
 	else if (id) senderSpan.innerHTML += this.get(id).username + ": ";
-	//else id = this.currentConversationId;
+	//else id = this.currentId;
 	
 	var messageText = document.createTextNode(message);
 	messageLabel.appendChild(senderSpan);

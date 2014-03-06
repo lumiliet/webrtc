@@ -13,6 +13,12 @@ GUI.setup = function() {
 		}
 	}
 	
+	var chatLabel = document.getElementById("chatLabel");
+	chatLabel.onclick = function(e) {
+		controller.call();
+	}
+	
+	
 	document.onkeyup = controller.documentKeyListener;
 	
 	var newGroupConversationButton = document.getElementById("newGroupConversation");
