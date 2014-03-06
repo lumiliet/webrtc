@@ -1,10 +1,6 @@
 function start() {
-
 	
-	//var userName = prompt("Username: ");
-	//easyrtc.setUsername(userName);
-	
-    var username = location.search && location.search.split('?')[1];
+	var username = location.search && location.search.split('?')[1];
 	
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
@@ -14,15 +10,16 @@ function start() {
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
 	easyrtc.connect("chat", function(id) {
-		controller.id = id;
-	});
-	
-	easyrtc.setStreamAcceptor(controller.acceptor);
-	easyrtc.setOnStreamClosed(controller.disconnectListener);
-	//easyrtc.setAcceptChecker(controller.acceptChecker);
-	
-	
-	
-	
+			controller.id = id;
+		},
+		function(easyrtcid, roomOwner){
+			if( roomOwner){ console.log("I'm the room owner"); }
+			console.log("my id is " + easyrtcid);
+		},
+		function(errorText){
+			console.log("failed to connect ", erFrText);
+		}
+	);
+
 	GUI.setup();
 }
