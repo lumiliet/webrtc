@@ -18,9 +18,24 @@ fileTransfer.startup = function() {
 }
 
 fileTransfer.sendFiles = function(files) {
-	if (conversationList.getCurrent().data) {		
-		var fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrentId());
-		fileSender(files, true);
+	var fileSender;
+	if (conversationList.getCurrent().data) {
+		if (conversationList.getCurrent().multi) {
+			var participants = conversationList.getCurrent().participants;
+			for (var i in participants) {
+				if (conversationList.get(participants[i]).data) {
+					fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrent().participants[i]);
+					fileSender(files, true);
+				}
+				else {
+					console.log("No datachannel exists with " + conversationList.getCurrent().participants[i]);
+				}
+			}
+		}
+		else {
+			fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrentId());
+			fileSender(files, true);
+		}
 	}
 }
 
@@ -41,6 +56,7 @@ fileTransfer.sendFileChangeListener = function(evt) {
 	files.push(evt.target.files[0]);
 	
 	fileTransfer.sendFiles(files);
+	
 }
 
 fileTransfer.handleDrop = function(evt) {
@@ -52,6 +68,7 @@ fileTransfer.handleDrop = function(evt) {
 
 	fileTransfer.sendFiles(files);
 }
+
 	
 fileTransfer.handleDragOver = function(evt) {
     evt.stopPropagation();
