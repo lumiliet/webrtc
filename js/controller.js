@@ -15,9 +15,8 @@ controller.updateGUI = function() {
 		GUI.writeHTMLToChat(conversationList.getCurrent().html);
 		if (conversationList.getCurrent().multi) GUI.setButtonDisabled("friendSelectMode", false);
 		else GUI.setButtonDisabled("friendSelectMode", true);
-		
+				
 		if (conversationList.getCurrent().data && conversationList.getCurrent().online) {
-			console.log("data");
 			GUI.setButtonDisabled("sendFile", false);
 		}
 		else GUI.setButtonDisabled("sendFile", true);
@@ -104,17 +103,18 @@ controller.call = function() {
 		for (var i in conversationList.getCurrent().participants) {
 			controller.dataCall(conversationList.getCurrent().participants[i]);
 			conversationList.getCurrent().data = true;
+			
+			console.log("Data transfer enabled");
 		}
 	}
 	else {
 		controller.dataCall(conversationList.getCurrentId());
 	}
-	/*
-	else {
-		easyrtc.hangup(conversationList.getCurrentId());
-	}
-	*/
+	
+	controller.updateGUI();
+	
 }
+
 
 
 controller.dataCall = function(id) {

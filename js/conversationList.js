@@ -77,6 +77,13 @@ conversationList.new = function(id, multi) {
 		}
 		this.participants.push(id);
 	}
+	
+	this.list[id].isParticipant = function(id) {
+		for (var i = 0; i < this.participants.length; i++) {
+			if (this.participants[i] === id) return true;
+		}
+		return false;
+	}
 }
 
 conversationList.newGroupConversation = function(conversationId) {
@@ -162,7 +169,6 @@ conversationList.generateMessageHTML = function(id, message) {
 
 	return messageLabel.outerHTML;
 }
-
 
 conversationList.updateOnlineFriends = function(friends) {
 	for (var id in this.list) {
