@@ -145,13 +145,6 @@ controller.dataCall = function(id) {
 	);
 }
 
-/* TODO use this for something
-easyrtc.initMediaSource(function(){
-	var videoSelf = document.getElementById("videoSelf");
-	controller.localVideo.stream = easyrtc.getLocalStream();
-	easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
-});
-*/
 
 
 
