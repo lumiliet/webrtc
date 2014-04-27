@@ -9,7 +9,7 @@ conversationList.new = function(id, multi) {
 	if (typeof(id) !== "string") return;
 	
 	this.list[id] = {
-		html: "",
+		messages: [],
 		id: id,
 		username: easyrtc.idToName(id),
 		active: false,
@@ -24,6 +24,32 @@ conversationList.new = function(id, multi) {
 		multi: (multi == true),
 		participants: []
 	};
+
+	this.list[id].addMessage = function(senderId, message) {
+		this.messages.push(
+			{
+				senderId: senderId,
+				sender: (conversationList.get(senderId) ? conversationList.get(senderId).username : "Me"),
+				message: message,
+			}
+		);
+	}
+
+	this.list[id].addParticipant = function(id) {
+		for (var i = 0; i < this.participants.length; i++) {
+			if (this.participants[i] === id) return;
+		}
+		this.participants.push(id);
+	}
+	
+	this.list[id].isParticipant = function(id) {
+		for (var i = 0; i < this.participants.length; i++) {
+			if (this.participants[i] === id) return true;
+		}
+		return false;
+	}
+
+
 	
 	this.list[id].toString = function() {
 		var out = "";
@@ -71,19 +97,7 @@ conversationList.new = function(id, multi) {
 		return out;
 	}
 	
-	this.list[id].addParticipant = function(id) {
-		for (var i = 0; i < this.participants.length; i++) {
-			if (this.participants[i] === id) return;
-		}
-		this.participants.push(id);
-	}
-	
-	this.list[id].isParticipant = function(id) {
-		for (var i = 0; i < this.participants.length; i++) {
-			if (this.participants[i] === id) return true;
-		}
-		return false;
-	}
+
 }
 
 conversationList.newGroupConversation = function(conversationId) {
@@ -129,15 +143,18 @@ conversationList.getCurrentId = function() {
 
 conversationList.setCurrent = function(id) {
 	if (this.list[this.currentId]) this.list[this.currentId].active = false;
-	if (this.list[id]) {
+
+	if (id === "");
+	else if (this.list[id]) {
 		this.list[id].active = true;
+		this.list[id].unseen = 0;
 	}
 	else {
 		this.new(id);
 		this.list[id].active = true;
+		this.list[id].unseen = 0;
 	}
 	this.currentId = id;
-	this.list[id].unseen = 0;
 }
 
 conversationList.updateFriends = function(friends) {
@@ -146,29 +163,6 @@ conversationList.updateFriends = function(friends) {
 	}
 }
 
-conversationList.addHTML = function(id, html) {
-	this.list[id].html += html;
-	this.list[id].visible = true;
-	if (!this.list[id].active) this.list[id].unseen++;
-}
-
-conversationList.generateMessageHTML = function(id, message) {
-	var messageLabel = document.createElement("div");
-	messageLabel.className = "chatMessage";
-	
-	var senderSpan = document.createElement("span");
-	senderSpan.className = "bold";
-	
-	if (id === this.currentId) senderSpan.innerHTML += "Me: ";
-	else if (id) senderSpan.innerHTML += this.get(id).username + ": ";
-	//else id = this.currentId;
-	
-	var messageText = document.createTextNode(message);
-	messageLabel.appendChild(senderSpan);
-	messageLabel.appendChild(messageText);
-
-	return messageLabel.outerHTML;
-}
 
 conversationList.updateOnlineFriends = function(friends) {
 	for (var id in this.list) {
@@ -177,4 +171,17 @@ conversationList.updateOnlineFriends = function(friends) {
 	for (var id in friends) {
 		if (this.list[id]) this.list[id].online = true;
 	}
+}
+
+conversationList.addMessage = function(conversationId, senderId, message) {
+	this.list[conversationId].addMessage(senderId, message);
+
+	if (conversationId !== this.currentId) this.list[conversationId].unseen ++;
+
+	this.list[conversationId].visible = true;
+}
+
+conversationList.closeConversation = function(conversationId) {
+	this.list[conversationId].messages.length = 0;
+	this.list[conversationId].visible = false;
 }

@@ -1,6 +1,6 @@
 var GUI = {
 	videoVisible: false,
-	documentTitle: "Simens Superchat",
+	documentTitle: "Webrtc Chat",
 	focus: true
 };
 
@@ -18,27 +18,15 @@ GUI.setup = function() {
 		controller.call();
 	}
 	
-/*	
-    var sendFile = document.getElementById("sendFile");
-	sendFile.addEventListener("change", fileTransfer.sendFileChangeListener);
-*/	
     var dropZone = document.getElementById('chatArea');
     dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
     dropZone.addEventListener('drop', fileTransfer.handleDrop);
 	
 	document.onkeyup = controller.documentKeyListener;
-/*
-	var newGroupConversationButton = document.getElementById("newGroupConversation");
-	newGroupConversationButton.onclick = controller.newGroupConversation;
-	
-	var friendSelectModeButton = document.getElementById("friendSelectMode");
-	friendSelectModeButton.onclick = controller.friendSelectModeListener;
-*/	
 	
 	messageField.focus();
 	
 	document.title = GUI.documentTitle;
-//	GUI.setButtonText("friendSelectMode", "Add friends to the conversation");
 
 	window.onblur = function() {
 		GUI.focus = false;
@@ -59,8 +47,9 @@ GUI.setButtonText = function(id, text) {
 	button.innerHTML = text;
 }
 
-GUI.writeHTMLToChat = function(html) {
+GUI.writeMessageToChat = function(message) {
 	var chatArea = document.getElementById("chatArea");
+	var html = GUI.generateMessageHTML(message);
 	chatArea.innerHTML += html;
 	
 	chatArea.scrollTop = chatArea.scrollHeight;
@@ -110,11 +99,42 @@ GUI.updateConversationList = function(list) {
 		conversationText.className = "conversationText";
 		conversationText.innerHTML += list[id].toString();
 		conversation.appendChild(conversationText);
-		conversation.onclick = function(id) {
+		conversationText.onclick = function(id) {
 			return function() {
 				controller.setCurrentConversation(id);
 			}
 		}(id);
+		
+			
+		var glyphContainer = document.createElement("span");
+		glyphContainer.className = "closeConversationGlyph";
+
+		var closeGlyph = document.createElement("span");
+		closeGlyph.className = " glyphicon glyphicon-remove";
+
+		conversation.onmouseover = function(closeGlyph) {
+			return function() {
+				closeGlyph.style.visibility = "visible";
+			}
+		}(closeGlyph);
+
+		conversation.onmouseout = function(closeGlyph) {
+			return function() {
+				closeGlyph.style.visibility = "hidden";
+			}
+		}(closeGlyph);
+
+		closeGlyph.onclick = function(id) {
+			return function() {
+				controller.closeConversation(id);
+			}
+		}(id);
+
+	
+
+		glyphContainer.appendChild(closeGlyph);
+
+		conversation.appendChild(glyphContainer);
 		
 		conversationList.appendChild(conversation);
 	}
@@ -165,3 +185,19 @@ GUI.toggleVideo = function(visible) {
 		GUI.videoVisible = false;
 	}
 }
+
+GUI.generateMessageHTML = function(message) {
+	var messageLabel = document.createElement("div");
+	messageLabel.className = "chatMessage";
+	
+	var senderSpan = document.createElement("span");
+	senderSpan.className = "bold";
+	senderSpan.innerHTML += message.sender + ": ";
+	
+	var messageText = document.createTextNode(message.message);
+	messageLabel.appendChild(senderSpan);
+	messageLabel.appendChild(messageText);
+
+	return messageLabel.outerHTML;
+}
+

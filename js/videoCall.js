@@ -1,4 +1,3 @@
-
 controller.acceptor = function(id, stream) {
 	if (controller.localVideo.enabled) return;
 	
@@ -37,58 +36,5 @@ controller.disconnectListener = function(id) {
 	var datetime = "Call ended: " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
 	conversationList.addMessageToConversation("", datetime);
 	controller.updateGUI();
-	
-}
-
-
-controller.friendClickListener = function(id) {
-	if (controller.friendSelectMode) {
-		var current = conversationList.getCurrent();
-		if (current && current.multi) {
-			controller.inviteFriendToRoom(id, current.id);
-		}
-	}
-	else controller.setCurrentConversation(id);
-	controller.updateGUI();
-}
-
-controller.friendSelectModeListener = function() {
-	var current = conversationList.getCurrent();
-	if (!controller.friendSelectMode) {
-		if (current && current.multi) {
-			controller.setFriendSelectMode(true);
-			
-			
-		}
-	}
-	else {
-		controller.setFriendSelectMode(false);
-		
-	}
-}
-
-
-controller.roomListener = function(roomName, friends) {
-	if (roomName === "default") {
-		GUI.updateFriendList(friends);
-		conversationList.updateOnlineFriends(friends);
-		controller.updateGUI();
-	}
-	else {
-		conversationList.conversationListener(roomName, friends);
-	}
-	conversationList.updateFriends(friends);
-	controller.updateGUI();
-}
-
-controller.documentKeyListener = function(e) {
-	if (e.keyCode === 27) {
-		controller.setFriendSelectMode(false);
-		
-	}
-	else if (e.keyCode === 13) {
-		controller.setFriendSelectMode(false);
-		
-	}
 	
 }

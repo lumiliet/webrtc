@@ -1,5 +1,7 @@
 html, body {
 	height:100%;
+	min-width:800px;
+	min-height: 400px;
 }
 
 .fill {
@@ -19,16 +21,19 @@ html, body {
 
 #friendList, #conversationList, #chatContainer {
 	position: absolute;
-	top: 10%;
+	top: 40px;
 	left: 0px;
 	right: 0px;
-	height: 90%;
+	height: calc(100% - 40px);
 	margin: auto;
+	overflow-y: auto;
+	overflow-x: hidden;
 
 }
 
 #chatArea {
-	height:90%;
+	position:relative;
+	height: calc(100% - 45px);
 	overflow-y: auto;
 	overflow-x: hidden;
 	word-wrap: break-word;
@@ -37,6 +42,7 @@ html, body {
 #sendMessageField {
 	position: absolute;
 	bottom: 10px;
+	height: 30px;
 	left:0px;
 	right:0px;
 	margin: auto;
@@ -49,7 +55,7 @@ html, body {
 	top: 0px;
 	left: 0px;
 	right: 0px;
-	height: 10%;
+	height: 40px;
 	margin: auto;
 	text-align: center;
 }
@@ -72,13 +78,26 @@ html, body {
 }
 
 .friendText, .conversationText {
+	position: absolute;
+	width: calc(100% - 20px);
 	padding-left: 20px;
-	line-height: 100%;
+	overflow-x: hidden;
 	word-break: break-all;
-
 	height:100%;
-
 }
-.friend:hover{
+.conversation:hover, .friend:hover{
 }
 
+.bold {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.closeConversationGlyph {
+	position: absolute;
+	top: 0px;
+	right: 4px;
+	visibility: hidden;
+	margin: auto;
+	text-align: right;
+}

@@ -12,14 +12,8 @@ controller.updateGUI = function() {
 	GUI.cleanChat();
 	
 	if (conversationList.getCurrentId()) {
-		GUI.writeHTMLToChat(conversationList.getCurrent().html);
-	//	if (conversationList.getCurrent().multi) GUI.setButtonDisabled("friendSelectMode", false);
-	//	else GUI.setButtonDisabled("friendSelectMode", true);
-				
-	//	if (conversationList.getCurrent().data && conversationList.getCurrent().online) {
-	//		GUI.setButtonDisabled("sendFile", false);
-	//	}
-	//	else GUI.setButtonDisabled("sendFile", true);
+		var messages = conversationList.getCurrent().messages;
+		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 	}
 	GUI.updateConversationList(conversationList.getAll());
 	var text = "";
@@ -51,7 +45,7 @@ controller.sendMessage = function() {
 	else {
 		easyrtc.sendData(conversationList.getCurrentId(), "message", message);
 	}
-	controller.addMessageToConversation(conversationList.getCurrentId(), message);
+	controller.addMessageToConversation(controller.id, message, conversationList.getCurrentId());
 	controller.updateGUI();
 }
 
@@ -72,9 +66,8 @@ controller.receiveMessage = function(id, msgType, message) {
 	controller.updateGUI();
 }
 
-controller.addMessageToConversation = function(sender, message, conversation) {
-	var html = conversationList.generateMessageHTML(sender, message);
-	conversationList.addHTML((conversation ? conversation : sender), html);
+controller.addMessageToConversation = function(senderId, message, conversationId) {
+	conversationList.addMessage((conversationId ? conversationId : senderId), senderId, message);
 }
 
 controller.newGroupConversation = function() {
@@ -86,8 +79,6 @@ controller.newGroupConversation = function() {
 controller.setFriendSelectMode = function(enable) {
 	controller.friendSelectMode = enable;
 	console.log("Friend select mode " + (enable? "activated" : "deactivated"));
-	//if (!enable) GUI.setButtonText("friendSelectMode", "Add friends to the conversation");
-	//else GUI.setButtonText("friendSelectMode", "Stop adding friends");
 	controller.updateGUI();
 	
 }
@@ -96,55 +87,46 @@ controller.inviteFriendToRoom = function(id, room) {
 	easyrtc.sendData(id, "roomInvite", room);
 }
 
-controller.call = function() {
-	if (!conversationList.getCurrentId()) return;
-	
-	if (conversationList.getCurrent().multi) {
-		for (var i in conversationList.getCurrent().participants) {
-			controller.dataCall(conversationList.getCurrent().participants[i]);
-			conversationList.getCurrent().data = true;
-			
-			console.log("Data transfer enabled");
+
+controller.friendClickListener = function(id) {
+	if (controller.friendSelectMode) {
+		var current = conversationList.getCurrent();
+		if (current && current.multi) {
+			controller.inviteFriendToRoom(id, current.id);
 		}
+	}
+	else controller.setCurrentConversation(id);
+	controller.updateGUI();
+}
+
+
+controller.roomListener = function(roomName, friends) {
+	if (roomName === "default") {
+		GUI.updateFriendList(friends);
+		conversationList.updateOnlineFriends(friends);
+		controller.updateGUI();
 	}
 	else {
-		controller.dataCall(conversationList.getCurrentId());
+		conversationList.conversationListener(roomName, friends);
 	}
-	
+	conversationList.updateFriends(friends);
 	controller.updateGUI();
+}
+
+controller.documentKeyListener = function(e) {
+	if (e.keyCode === 27) {
+		controller.setFriendSelectMode(false);
+		
+	}
+	else if (e.keyCode === 13) {
+		controller.setFriendSelectMode(false);
+		
+	}
 	
 }
 
-
-
-controller.dataCall = function(id) {
-	console.log("Data call to "  + conversationList.get(id));
-	if (!conversationList.get(id).online) {
-		console.log("Call failed, friend no longer online");
-		return;
-	}
-	if (conversationList.get(id).data) {
-		console.log("Call failed, datachannel already exists ");
-		return;
-	}
-	easyrtc.call(id,
-		function(otherCaller, mediaType) {
-			console.log("Call succesful - " + otherCaller + " - " + mediaType);
-		},
-		function(errorCode, errMessage) {
-			console.log("Call failed - " + errorCode + " - " + errMessage);
-		},
-		function(wasAccepted, easyrtcid){
-			if( wasAccepted ){
-				console.log("call accepted by " + easyrtc.idToName(easyrtcid));
-			}
-			else{
-			  	console.log("call rejected" + easyrtc.idToName(easyrtcid));
-			}
-		}
-	);
+controller.closeConversation = function(conversationId) {
+	conversationList.closeConversation(conversationId);
+	conversationList.setCurrent("");
+	controller.updateGUI();
 }
-
-
-
-

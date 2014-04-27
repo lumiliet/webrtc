@@ -9,14 +9,11 @@
 <script type="text/javascript" src="js/GUI.js"></script>
 <script type="text/javascript" src="js/controller.js"></script>
 <script type="text/javascript" src="js/conversationList.js"></script>
-<script type="text/javascript" src="js/listeners.js"></script>
 <script type="text/javascript" src="js/fileTransfer.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
 <script type="text/javascript" src="/easyrtc/easyrtc_ft.js"></script>
-
-
 
 <link rel="shortcut icon" href="uninett-bootstrap-theme/uninett-theme/ico/favicon.ico">
 
@@ -25,46 +22,47 @@
 </head>
 <body onload="start()">
 
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-			<a class="navbar-brand" href="#"><img src="uninett-bootstrap-theme/uninett-theme/images/UNINETT_logo.svg" alt="Uninett logo" type="image/svg+xml"></a>
+	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><img src="uninett-bootstrap-theme/uninett-theme/images/UNINETT_logo.svg" alt="Uninett logo" type="image/svg+xml"></a>
 
-		</div>
-		<div class="navbar-department">
-			<div class="department">Chat</div>
-		</div>
-	</div>
-</div>
-
-<div class="container fill">
-	<div class="row fill">
-		<div class="col-xs-3 fill">
-			<div class="uninett-color-lightBlue gutterFill ">
-				<div id="leftLabel">History</div>
-				<div id="conversationList"></div>	
+			</div>
+			<div class="navbar-department">
+				<div class="department">Chat</div>
 			</div>
 		</div>
+	</div>
 
-		<div class="col-xs-6 fill">
-			<div class="uninett-color-lightGreen  gutterFill">
+	<div class="container fill">
+		<div class="row fill">
+			<div class="col-xs-3 fill">
+				<div class="uninett-color-lightBlue gutterFill ">
+					<div id="leftLabel">History</div>
+					<div id="conversationList">
+					
+					</div>	
+				</div>
+			</div>
 
-				<div id="midLabel"></div>
-				<div id="chatContainer">
-					<div id="chatArea"> </div>
-						<input type="text" id="sendMessageField">
+			<div class="col-xs-6 fill">
+				<div class="uninett-color-lightGreen  gutterFill">
+
+					<div id="midLabel"></div>
+					<div id="chatContainer">
+						<div id="chatArea"> </div>
+							<input type="text" id="sendMessageField">
+					</div>
+				</div>
+			</div>
+
+			<div class="col-xs-3 fill">
+				<div class="uninett-color-orange gutterFill">
+					<div id="rightLabel">Friends online</div>
+					<div id="friendList"></div>
 				</div>
 			</div>
 		</div>
-
-		<div class="col-xs-3 fill">
-			<div class="uninett-color-orange gutterFill">
-				<div id="rightLabel">Friends online</div>
-				<div id="friendList"></div>
-			</div>
-		</div>
 	</div>
-</div>
 </body>
 
