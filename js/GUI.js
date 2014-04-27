@@ -270,7 +270,7 @@ GUI.generateMessageHTML = function(message) {
 	messageLabel.className = "chatMessage";
 
 	var senderSpan = document.createElement("span");
-	senderSpan.className = "bold";
+	senderSpan.className = "h4";
 	senderSpan.innerHTML += message.sender + ": ";
 
 	var messageText = document.createTextNode(message.message);
