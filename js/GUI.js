@@ -1,31 +1,31 @@
 var GUI = {
 	videoVisible: false,
 	documentTitle: "Webrtc Chat",
-	focus: true
+	focus: true,
+	friends: []
 };
 
 GUI.setup = function() {
-	
+
 	var messageField = document.getElementById("sendMessageField");
 	messageField.onkeyup = function(e) {
 		if (e.keyCode === 13) {
 			controller.sendMessage();
 		}
 	}
-	
-	var midLabel = document.getElementById("midLabel");
-	midLabel.onclick = function(e) {
-		controller.call();
-	}
-	
-    var dropZone = document.getElementById('chatArea');
-    dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
-    dropZone.addEventListener('drop', fileTransfer.handleDrop);
-	
+
+	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
+	newGroupConversationButton.onclick = function() {
+		controller.selectGroupMembersButtonListener();
+	};	
+
+	var dropZone = document.getElementById('chatArea');
+	dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
+	dropZone.addEventListener('drop', fileTransfer.handleDrop);
+
 	document.onkeyup = controller.documentKeyListener;
-	
-	messageField.focus();
-	
+
+
 	document.title = GUI.documentTitle;
 
 	window.onblur = function() {
@@ -35,6 +35,11 @@ GUI.setup = function() {
 		GUI.focus = true;
 		GUI.notification("", true);
 	};
+}
+
+GUI.focusize = function() {
+	var messageField = document.getElementById("sendMessageField");
+	messageField.focus();
 }
 
 GUI.setButtonDisabled = function(id, disabled) {
@@ -51,7 +56,7 @@ GUI.writeMessageToChat = function(message) {
 	var chatArea = document.getElementById("chatArea");
 	var html = GUI.generateMessageHTML(message);
 	chatArea.innerHTML += html;
-	
+
 	chatArea.scrollTop = chatArea.scrollHeight;
 }
 
@@ -84,11 +89,11 @@ GUI.setChatLabel = function(text) {
 
 GUI.updateConversationList = function(list) {
 	var conversationList = document.getElementById("conversationList");
-	
+
 	while (conversationList.hasChildNodes()) {
 		conversationList.removeChild(conversationList.lastChild);
 	}
-	
+
 	for (var id in list) {
 		if (!list[id].visible) continue;
 		var conversation = document.createElement("div");
@@ -104,13 +109,13 @@ GUI.updateConversationList = function(list) {
 				controller.setCurrentConversation(id);
 			}
 		}(id);
-		
-			
+
+
 		var glyphContainer = document.createElement("span");
 		glyphContainer.className = "closeConversationGlyph";
 
 		var closeGlyph = document.createElement("span");
-		closeGlyph.className = " glyphicon glyphicon-remove";
+		closeGlyph.className = "glyph glyphicon glyphicon-remove";
 
 		conversation.onmouseover = function(closeGlyph) {
 			return function() {
@@ -130,21 +135,25 @@ GUI.updateConversationList = function(list) {
 			}
 		}(id);
 
-	
+
 
 		glyphContainer.appendChild(closeGlyph);
 
 		conversation.appendChild(glyphContainer);
-		
+
 		conversationList.appendChild(conversation);
 	}
-	
-	
+
+
 }
 
 GUI.updateFriendList = function(friends) {
+	if (friends) GUI.friends = friends;
+	else friends = GUI.friends;
+
+
 	var friendList = document.getElementById("friendList");
-	
+
 	while (friendList.hasChildNodes()) {
 		friendList.removeChild(friendList.lastChild);
 	}
@@ -156,14 +165,84 @@ GUI.updateFriendList = function(friends) {
 		friendText.className = "friendText";
 		friendText.innerHTML += easyrtc.idToName(id);
 		friend.id = "friend_" + id;
+
+
 		friend.appendChild(friendText);
 
-		friend.onclick = function(id) {
-			return function() {
-				controller.friendClickListener(id);
+		var glyphs = document.createElement("span");
+		glyphs.className = "friendGlyphContainer";
+
+		if (controller.friendSelectMode) {
+			glyphs.style.visibility = "visible";
+
+			var untickedGlyph = document.createElement("span");
+
+			if (controller.isFriendSelected(id)) {
+			
+				untickedGlyph.className = "checkFriendGlyph glyphicon glyphicon-check";
 			}
-		}(id);
-		
+			else {
+				untickedGlyph.className = "checkFriendGlyph glyphicon glyphicon-unchecked";
+			}
+			untickedGlyph.onclick = function(id) {
+
+
+				return function() {
+					if (this.className.indexOf("unchecked") > 0) {
+						this.className = "checkFriendGlyph glyphicon glyphicon-check";
+						controller.toggleFriendSelect(id);
+					}
+					else {
+						this.className = "checkFriendGlyph glyphicon glyphicon-unchecked";
+						controller.toggleFriendSelect(id);
+
+					}
+				}
+			}(id);
+
+
+			glyphs.appendChild(untickedGlyph);
+		}
+		else {
+			glyphs.style.visibility = "hidden";
+			var startChatButton = document.createElement("span");
+			var startVideoButton = document.createElement("span");
+			var startAudioButton = document.createElement("span");
+
+			startChatButton.className = "glyph glyphicon glyphicon-comment";
+			startVideoButton.className = "glyph glyphicon glyphicon-facetime-video";
+			startAudioButton.className = "glyph glyphicon glyphicon-volume-up";
+
+			startChatButton.onclick = function(id) {
+				return function() {
+					controller.friendClickListener(id);
+				}
+			}(id);
+
+
+			glyphs.appendChild(startChatButton);
+			//	glyphs.appendChild(startVideoButton);
+			//	glyphs.appendChild(startAudioButton);
+
+
+			friend.onmouseover = function(glyphs) {
+				return function() {
+					glyphs.style.visibility = "visible";
+				}
+			}(glyphs);
+
+			friend.onmouseout = function(glyphs) {
+				return function() {
+					glyphs.style.visibility = "hidden";
+				}
+			}(glyphs);
+
+		}
+
+
+
+		friend.appendChild(glyphs);
+
 		friendList.appendChild(friend);
 	}
 }
@@ -189,11 +268,11 @@ GUI.toggleVideo = function(visible) {
 GUI.generateMessageHTML = function(message) {
 	var messageLabel = document.createElement("div");
 	messageLabel.className = "chatMessage";
-	
+
 	var senderSpan = document.createElement("span");
 	senderSpan.className = "bold";
 	senderSpan.innerHTML += message.sender + ": ";
-	
+
 	var messageText = document.createTextNode(message.message);
 	messageLabel.appendChild(senderSpan);
 	messageLabel.appendChild(messageText);

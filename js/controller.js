@@ -1,21 +1,33 @@
 var controller = {
 	friendSelectMode: false,
+	friendSelection: {},
 	id: ""
 }
 
 controller.setCurrentConversation = function(id) {
 	conversationList.setCurrent(id);
+	conversationList.getCurrent().visible = true;
 	controller.updateGUI();
 }
 
 controller.updateGUI = function() {
 	GUI.cleanChat();
+
+	if (controller.friendSelectMode) {
+		GUI.setButtonText("newGroupConversationButton", " Done");
+	}
+	else {
+		GUI.setButtonText("newGroupConversationButton", "<span class=\"glyphicon glyphicon-plus\"></span> New group conversation");
+	
+	}
 	
 	if (conversationList.getCurrentId()) {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 	}
 	GUI.updateConversationList(conversationList.getAll());
+	GUI.updateFriendList();
+
 	var text = "";
 	if (conversationList.getCurrent()) {	
 		text += conversationList.getCurrent().toStringTitle();
@@ -26,6 +38,7 @@ controller.updateGUI = function() {
 	
 	
 	GUI.setChatLabel(text);	
+	GUI.focusize();
 }
 
 controller.sendMessage = function() {
@@ -70,17 +83,48 @@ controller.addMessageToConversation = function(senderId, message, conversationId
 	conversationList.addMessage((conversationId ? conversationId : senderId), senderId, message);
 }
 
-controller.newGroupConversation = function() {
+controller.selectGroupMembersButtonListener = function() {
+	if (controller.friendSelectMode) {
+
+		if (Object.keys(controller.friendSelection).length !== 0) controller.createGroupConversation();
+		controller.setFriendSelectMode(false);
+	}
+	
+	else {
+		controller.setFriendSelectMode(true);
+	}
+	controller.updateGUI();
+}
+
+controller.createGroupConversation = function() {
 	var groupConversation = conversationList.newGroupConversation();
 	easyrtc.joinRoom(groupConversation.id);	
-	controller.updateGUI();
+
+	controller.setCurrentConversation(groupConversation.id);
+	for (var friend in controller.friendSelection) {
+		controller.inviteFriendToRoom(friend, groupConversation.id);
+	}
 }
 
 controller.setFriendSelectMode = function(enable) {
 	controller.friendSelectMode = enable;
+	if (!enable) controller.friendSelection = {};
 	console.log("Friend select mode " + (enable? "activated" : "deactivated"));
 	controller.updateGUI();
 	
+}
+
+controller.toggleFriendSelect = function(id) {
+	if (!controller.friendSelectMode) return;
+	if (controller.friendSelection[id]) delete controller.friendSelection[id];
+	else controller.friendSelection[id] = {};
+
+	console.log(controller.friendSelection);
+}
+
+controller.isFriendSelected = function(id) {
+	if (controller.friendSelection[id]) return true;
+	return false;
 }
 
 controller.inviteFriendToRoom = function(id, room) {
@@ -89,13 +133,7 @@ controller.inviteFriendToRoom = function(id, room) {
 
 
 controller.friendClickListener = function(id) {
-	if (controller.friendSelectMode) {
-		var current = conversationList.getCurrent();
-		if (current && current.multi) {
-			controller.inviteFriendToRoom(id, current.id);
-		}
-	}
-	else controller.setCurrentConversation(id);
+	controller.setCurrentConversation(id);
 	controller.updateGUI();
 }
 
@@ -115,10 +153,6 @@ controller.roomListener = function(roomName, friends) {
 
 controller.documentKeyListener = function(e) {
 	if (e.keyCode === 27) {
-		controller.setFriendSelectMode(false);
-		
-	}
-	else if (e.keyCode === 13) {
 		controller.setFriendSelectMode(false);
 		
 	}
