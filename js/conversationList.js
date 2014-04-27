@@ -183,5 +183,6 @@ conversationList.addMessage = function(conversationId, senderId, message) {
 
 conversationList.closeConversation = function(conversationId) {
 	this.list[conversationId].messages.length = 0;
+	this.list[conversationId].unseen = 0;
 	this.list[conversationId].visible = false;
 }
