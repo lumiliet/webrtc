@@ -35,6 +35,16 @@ GUI.setup = function() {
 		GUI.focus = true;
 		GUI.notification("", true);
 	};
+
+	var conversationList = document.getElementById("conversationList");
+	conversationList.onscroll = function() {
+		controller.updateGUI();
+	}
+	var friendList = document.getElementById("friendList");
+	friendList.onscroll = function() {
+		controller.updateGUI();
+	}
+
 }
 
 GUI.focusize = function() {
@@ -98,7 +108,7 @@ GUI.updateConversationList = function(list) {
 		if (!list[id].visible) continue;
 		var conversation = document.createElement("div");
 		conversation.className = "conversation " + (list[id].active ? "conversationActive" : "conversationPassive");
-		conversation.id = "conversation_" + id;
+		conversation.id = "conversation_" + list[id].id;
 
 		var conversationText = document.createElement("span");
 		conversationText.className = "conversationText";
@@ -108,7 +118,7 @@ GUI.updateConversationList = function(list) {
 			return function() {
 				controller.setCurrentConversation(id);
 			}
-		}(id);
+		}(list[id].id);
 
 
 		var glyphContainer = document.createElement("span");
@@ -133,7 +143,7 @@ GUI.updateConversationList = function(list) {
 			return function() {
 				controller.closeConversation(id);
 			}
-		}(id);
+		}(list[id].id);
 
 
 
@@ -179,21 +189,21 @@ GUI.updateFriendList = function(friends) {
 
 			if (controller.isFriendSelected(id)) {
 			
-				untickedGlyph.className = "checkFriendGlyph glyphicon glyphicon-check";
+				untickedGlyph.className = "glyph glyphicon glyphicon-check";
 			}
 			else {
-				untickedGlyph.className = "checkFriendGlyph glyphicon glyphicon-unchecked";
+				untickedGlyph.className = "glyph glyphicon glyphicon-unchecked";
 			}
 			untickedGlyph.onclick = function(id) {
 
 
 				return function() {
 					if (this.className.indexOf("unchecked") > 0) {
-						this.className = "checkFriendGlyph glyphicon glyphicon-check";
+						this.className = "glyph glyphicon glyphicon-check";
 						controller.toggleFriendSelect(id);
 					}
 					else {
-						this.className = "checkFriendGlyph glyphicon glyphicon-unchecked";
+						this.className = "glyph glyphicon glyphicon-unchecked";
 						controller.toggleFriendSelect(id);
 
 					}

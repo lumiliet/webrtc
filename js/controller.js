@@ -6,7 +6,6 @@ var controller = {
 
 controller.setCurrentConversation = function(id) {
 	conversationList.setCurrent(id);
-	conversationList.getCurrent().visible = true;
 	controller.updateGUI();
 }
 
@@ -52,7 +51,7 @@ controller.sendMessage = function() {
 	if (conversationList.getCurrent().multi) {
 		var participants = conversationList.getCurrent().participants
 		for (var i in participants) {
-			easyrtc.sendData(participants[i], conversationList.getCurrentId(), message);
+			if (conversationList.get(participants[i]).online) easyrtc.sendData(participants[i], conversationList.getCurrentId(), message);
 		}
 	}
 	else {

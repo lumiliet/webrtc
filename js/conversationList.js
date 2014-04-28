@@ -20,7 +20,9 @@ conversationList.new = function(id, multi) {
 		stream: {},
 		visible: false,
 		online: true,
-		
+		mostRecentTime: 0,
+
+
 		multi: (multi == true),
 		participants: []
 	};
@@ -31,8 +33,14 @@ conversationList.new = function(id, multi) {
 				senderId: senderId,
 				sender: (conversationList.get(senderId) ? conversationList.get(senderId).username : "Me"),
 				message: message,
+				time: function() {
+					var date = new Date();
+					conversationList.list[id].mostRecentTime = date.getTime();
+					return date.getTime();
+				}()
 			}
 		);
+		console.log((new Date()).getTime());
 	}
 
 	this.list[id].addParticipant = function(id) {
@@ -83,6 +91,7 @@ conversationList.new = function(id, multi) {
 				for (var i = 0; i < this.participants.length; i++) {
 					out += conversationList.get(this.participants[i]).username;
 					if (!conversationList.get(this.participants[i]).online) out += " (offline)";
+					if (i === (this.participants.length - 2)) out += " and ";
 					if (i !== (this.participants.length -1)) out += ", ";
 				}
 			}
@@ -128,7 +137,13 @@ conversationList.get = function(id) {
 }
 
 conversationList.getAll = function() {
-	return this.list;
+	var tempList = [];
+	for (var conversation in this.list) {
+		tempList.push(this.list[conversation]);
+	}
+	tempList.sort(function(a,b) {return b.mostRecentTime - a.mostRecentTime;});
+
+	return tempList;
 }
 
 conversationList.getCurrent = function() {
@@ -143,6 +158,7 @@ conversationList.getCurrentId = function() {
 
 conversationList.setCurrent = function(id) {
 	if (this.list[this.currentId]) this.list[this.currentId].active = false;
+	
 
 	if (id === "");
 	else if (this.list[id]) {
@@ -155,6 +171,14 @@ conversationList.setCurrent = function(id) {
 		this.list[id].unseen = 0;
 	}
 	this.currentId = id;
+
+	
+	if (this.list[id] && this.list[id].mostRecentTime === 0) {
+		this.list[id].visible = true;
+		this.list[id].mostRecentTime = (new Date()).getTime();
+	}
+
+
 }
 
 conversationList.updateFriends = function(friends) {

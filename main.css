@@ -19,22 +19,24 @@ html, body {
 
 #leftLabel, #midLabel, #rightLabel {
 	font-size: 1.1em;
-	padding:10px;
 	position: absolute;
 	top: 0px;
 	left: 0px;
 	right: 0px;
-	height: 40px;
+	height: 50px;
+	line-height: 50px;
 	margin: auto;
 	text-align: center;
+	overflow: auto;
 }
+
 
 #friendList, #conversationList, #chatArea {
 	position: absolute;
-	top: 40px;
+	top: 50px;
 	left: 0px;
 	right: 0px;
-	height: calc(100% - 50px - 40px);
+	height: calc(100% - 50px - 50px);
 	margin: auto;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -61,17 +63,26 @@ html, body {
 	position: relative;
 	vertical-align: middle;
 	width: 100%;
+	overflow: hidden;
+}
+
+.friend {
 	height: 30px;
 	line-height: 30px;
-	overflow-x: hidden;
-	overflow-y: hidden;
+}
 
+.conversation {
+	height: 50px;
+	line-height: 50px;
+}
+
+.conversationActive {
+	background-color: #6EBBE6;
 }
 
 .friendText, .conversationText {
 	position: absolute;
 	padding-left: 20px;
-	overflow-x: hidden;
 	word-break: break-all;
 	height:100%;
 }
@@ -87,15 +98,17 @@ html, body {
 }
 
 .conversation:hover, .friend:hover{
+	//background-color: #eeebe8;
 }
+
 
 
 .closeConversationGlyph {
 	position: absolute;
 	top: 0px;
 	right: 4px;
-	visibility: hidden;
 	margin: auto;
+	visibility: hidden;
 }
 
 .friendGlyphContainer {
@@ -109,6 +122,50 @@ html, body {
 .glyph {
 	padding-right: 25px;
 	font-size: 1.3em;
+	line-height: inherit;
 
 	cursor: pointer;
 }
+
+
+
+/*
+
+.uninett-color-lightBlue {
+	background-color: #92ceef;
+}
+
+.uninett-color-blue {
+	background-color: #005c9e;
+}
+
+.uninett-color-darkBlue {
+	background-color: #00404c;
+}
+
+.uninett-color-lightGreen {
+	background-color: #4cc0be;
+}
+
+.uninett-color-green {
+	background-color: #00b086;
+}
+
+.uninett-color-darkGreen {
+	background-color: #006b49;
+}
+
+.uninett-color-white {
+	background-color: #ffffff;
+}
+
+.uninett-color-red {
+	background-color: #eb212e;
+}
+
+.uninett-color-orange {
+	background-color: #f3823e;
+}
+
+
+*/
