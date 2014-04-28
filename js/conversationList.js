@@ -92,7 +92,7 @@ conversationList.new = function(id, multi) {
 					out += conversationList.get(this.participants[i]).username;
 					if (!conversationList.get(this.participants[i]).online) out += " (offline)";
 					if (i === (this.participants.length - 2)) out += " and ";
-					if (i !== (this.participants.length -1)) out += ", ";
+					else if (i !== (this.participants.length -1)) out += ", ";
 				}
 			}
 			else {
@@ -209,4 +209,5 @@ conversationList.closeConversation = function(conversationId) {
 	this.list[conversationId].messages.length = 0;
 	this.list[conversationId].unseen = 0;
 	this.list[conversationId].visible = false;
+	this.list[conversationId].mostRecentTime = 0;
 }

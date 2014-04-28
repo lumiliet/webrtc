@@ -14,6 +14,9 @@ GUI.setup = function() {
 		}
 	}
 
+	var midLabel = document.getElementById("midLabel");
+	midLabel.onclick = function() {controller.call();};
+
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {
 		controller.selectGroupMembersButtonListener();

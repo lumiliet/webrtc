@@ -51,11 +51,11 @@ controller.sendMessage = function() {
 	if (conversationList.getCurrent().multi) {
 		var participants = conversationList.getCurrent().participants
 		for (var i in participants) {
-			if (conversationList.get(participants[i]).online) easyrtc.sendData(participants[i], conversationList.getCurrentId(), message);
+			if (conversationList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversationList.getCurrentId(), message);
 		}
 	}
 	else {
-		easyrtc.sendData(conversationList.getCurrentId(), "message", message);
+		easyrtc.sendDataWS(conversationList.getCurrentId(), "message", message);
 	}
 	controller.addMessageToConversation(controller.id, message, conversationList.getCurrentId());
 	controller.updateGUI();
@@ -127,7 +127,7 @@ controller.isFriendSelected = function(id) {
 }
 
 controller.inviteFriendToRoom = function(id, room) {
-	easyrtc.sendData(id, "roomInvite", room);
+	easyrtc.sendDataWS(id, "roomInvite", room);
 }
 
 
@@ -160,6 +160,6 @@ controller.documentKeyListener = function(e) {
 
 controller.closeConversation = function(conversationId) {
 	conversationList.closeConversation(conversationId);
-	conversationList.setCurrent("");
+	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
 	controller.updateGUI();
 }
