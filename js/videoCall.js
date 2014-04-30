@@ -1,4 +1,4 @@
-controller.acceptor = function(id, stream) {
+videoCall.acceptor = function(id, stream) {
 	if (controller.localVideo.enabled) return;
 	
 	controller.setCurrentConversation(id);
@@ -21,7 +21,7 @@ controller.acceptor = function(id, stream) {
 	controller.updateGUI();
 }
 
-controller.disconnectListener = function(id) {
+videoCall.disconnectListener = function(id) {
 	if (!controller.localVideo.enabled) return;
 	
 	//controller.localVideo.stream.stop();
@@ -37,4 +37,8 @@ controller.disconnectListener = function(id) {
 	conversationList.addMessageToConversation("", datetime);
 	controller.updateGUI();
 	
+}
+
+videoCall.call = function() {
+
 }

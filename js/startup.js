@@ -6,7 +6,7 @@ function start() {
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(false);
 	easyrtc.enableAudio(false);
-	easyrtc.enableDataChannels(true);
+	easyrtc.enableDataChannels(false);
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
@@ -31,4 +31,5 @@ function start() {
 
 	GUI.setup();
 
+	controller.cameraWindow = window.open("camera.html");
 }
