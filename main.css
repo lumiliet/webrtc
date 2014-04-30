@@ -44,13 +44,20 @@ html, body {
 
 }
 	
-#newGroupConversationButton, #sendMessageField {
+#newGroupConversationButton, #sendMessageField, #glyphs {
 	position: absolute;
 	bottom: 10px;
 	width: calc(100% - 20px);
 	height: 34px;
 	left: 0px;
 	right: 0px;
+	margin: auto;
+}
+
+#startVideoGlyph {
+	right: 0px;
+	left: 0px;
+	position: absolute;
 	margin: auto;
 }
 

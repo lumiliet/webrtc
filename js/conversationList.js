@@ -40,7 +40,6 @@ conversationList.new = function(id, multi) {
 				}()
 			}
 		);
-		console.log((new Date()).getTime());
 	}
 
 	this.list[id].addParticipant = function(id) {

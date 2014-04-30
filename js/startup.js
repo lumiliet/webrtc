@@ -5,6 +5,7 @@ function start() {
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(false);
+	easyrtc.enableVideoReceive(true);
 	easyrtc.enableAudio(false);
 	easyrtc.enableDataChannels(false);
 	easyrtc.setPeerListener(controller.receiveMessage);
@@ -26,10 +27,15 @@ function start() {
 	easyrtc.setDataChannelOpenListener(controller.dataChannelOpenListener);
 	easyrtc.setDataChannelCloseListener(controller.dataChannelCloseListener);
 	
+	easyrtc.setStreamAcceptor(videoCall.acceptor);
+	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
+
 	fileTransfer.startup();
-	
 
 	GUI.setup();
 
-	controller.cameraWindow = window.open("camera.html");
+}
+
+function openCamWindow() {
+	controller.cameraWindow = window.open("","","width=400,height=400");	
 }

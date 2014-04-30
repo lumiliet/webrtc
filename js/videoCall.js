@@ -1,44 +1,59 @@
+var videoCall = {
+	localVideo: {
+		stream: {},
+		enabled: false
+	}
+}
+
+
 videoCall.acceptor = function(id, stream) {
-	if (controller.localVideo.enabled) return;
-	
-	controller.setCurrentConversation(id);
-	
-	controller.localVideo.stream = easyrtc.getLocalStream();
-	controller.localVideo.enabled = true;
-	
-	conversationList.get(id).stream = stream;
+
+
 	conversationList.get(id).video = true;
+	conversationList.get(id).stream = stream;
+
 	
-	var videoSelf = document.getElementById("videoSelf");
-	var videoCaller = document.getElementById("videoCaller");
-	easyrtc.setVideoObjectSrc(videoSelf, controller.localVideo.stream);
-	easyrtc.setVideoObjectSrc(videoCaller, stream);
-	
-	GUI.toggleVideo(true);
-	var currentdate = new Date(); 
-	var datetime = "Call started: " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-	conversationList.addMessageToConversation("", datetime);
-	controller.updateGUI();
+	easyrtc.setVideoObjectSrc(videoCall.createVideoElement(id), stream);
 }
 
 videoCall.disconnectListener = function(id) {
-	if (!controller.localVideo.enabled) return;
-	
-	//controller.localVideo.stream.stop();
-	controller.localVideo.stream = {};
-	controller.localVideo.enabled = false;
-	
-	conversationList.get(id).stream = {};
-	conversationList.get(id).video = false;
-	
-	GUI.toggleVideo(false);
-	var currentdate = new Date(); 
-	var datetime = "Call ended: " + currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
-	conversationList.addMessageToConversation("", datetime);
-	controller.updateGUI();
-	
+	videoCall.deleteVideoElement(id);
 }
 
 videoCall.call = function() {
 
+}
+
+videoCall.enableCamera = function() {
+	easyrtc.initMediaSource(
+		function(){
+
+			videoCall.localVideo.stream = easyrtc.getLocalStream();
+			videoCall.localVideo.enabled = true;
+
+			easyrtc.setVideoObjectSrc( controller.cameraWindow.document.getElementById("videoSelf"), videoCall.localVideo.stream);
+		},
+		function(){
+			easyrtc.showError("no-media", "Unable to get local media");
+		}
+	);
+}
+
+videoCall.disableCamera = function() {
+	videoCall.localVideo.stream.stop();
+	videoCall.localVideo.stream = {};
+	videoCall.localVideo.enabled = false;
+}
+
+videoCall.createVideoElement = function(id) {
+
+	var video = controller.cameraWindow.document.createElement("video");
+	video.id = "video_" + id;
+	controller.cameraWindow.document.body.appendChild(video);
+	return video;
+}
+
+videoCall.deleteVideoElement = function(id) {
+	var video = controller.cameraWindow.document.getElementById("video_" + id);
+	controller.cameraWindow.document.body.removeChild(video);
 }

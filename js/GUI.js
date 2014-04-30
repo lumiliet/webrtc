@@ -14,8 +14,8 @@ GUI.setup = function() {
 		}
 	}
 
-	var midLabel = document.getElementById("midLabel");
-	midLabel.onclick = function() {controller.call();};
+	var startVideoGlyph = document.getElementById("startVideoGlyph");
+	startVideoGlyph.onclick = function() {controller.sendVideo();};
 
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {

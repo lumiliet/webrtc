@@ -165,35 +165,28 @@ controller.closeConversation = function(conversationId) {
 	controller.updateGUI();
 }
 
-controller.call = function() {
+controller.sendVideo = function() {
 	if (!conversationList.getCurrentId()) return;
 	
-	easyrtc.enableDataChannels(true);
+	easyrtc.enableVideo(true);
+
 	if (conversationList.getCurrent().multi) {
-		for (var i in conversationList.getCurrent().participants) {
-			controller.dataCall(conversationList.getCurrent().participants[i]);
-			conversationList.getCurrent().data = true;
-			
-			console.log("Data transfer enabled");
+		var participants = conversationList.getCurrent().participants;
+		for (var p in participants) {
+			controller.call(participants[p]);
 		}
 	}
-	else {
-		controller.dataCall(conversationList.getCurrentId());
-	}
+	else controller.call(conversationList.getCurrentId());
+
 	
 	controller.updateGUI();
-	
 }
   
 
-controller.dataCall = function(id) {
-	console.log("Data call to "  + conversationList.get(id));
+controller.call = function(id) {
+	console.log("Call to "  + conversationList.get(id));
 	if (!conversationList.get(id).online) {
 		console.log("Call failed, friend no longer online");
-		return;
-	}
-	if (conversationList.get(id).data) {
-		console.log("Call failed, datachannel already exists ");
 		return;
 	}
 	easyrtc.call(id,
