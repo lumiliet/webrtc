@@ -178,7 +178,6 @@ controller.signalVideoWaiting= function(id, conversationId) {
 controller.sendVideo = function() {
 	var conversation = conversationList.getCurrent();
 	if (!conversation) return;
-	easyrtc.enableVideo(true);
 
 	if (conversation.multi) {
 		var participants = conversation.participants;
@@ -205,6 +204,13 @@ controller.sendVideo = function() {
 	controller.updateGUI();
 }
 
+//use this. In a loop or something, remember concurrency
+controller.disableVideo = function() {
+	window.setTimout(function() {
+		easyrtc.enablevideo(false);
+	}, 1000);
+}
+
 
 controller.call = function(id, conversationId) {
 	console.log("Call to "  + conversationList.get(id));
@@ -213,6 +219,9 @@ controller.call = function(id, conversationId) {
 		return;
 	}
 	controller.signalVideoWaiting(id, conversationId);
+	
+	//remove this line when you have a better solution
+	easyrtc.enableVideo(true);
 	easyrtc.call(id,
 		function(otherCaller, mediaType) {
 			console.log("Call succesful - " + otherCaller + " - " + mediaType);

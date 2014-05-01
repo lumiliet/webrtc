@@ -16,7 +16,7 @@ conversationList.new = function(id, multi) {
 		unseen: 0,
 		audio: false,
 		sendingVideo: false,
-		waitingForGroupVideo: {},
+		waitingForGroupVideo: null,
 		data: false,
 		visible: false,
 		online: true,
@@ -106,7 +106,7 @@ conversationList.new = function(id, multi) {
 
 	this.list[id].stopVideoWaiting = function() {
 		console.log("Stopped waiting for group video");
-		this.waitingForGroupVideo = {};
+		this.waitingForGroupVideo = null;
 	}
 	
 	this.list[id].toString = function() {

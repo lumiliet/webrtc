@@ -9,18 +9,18 @@ var videoCall = {
 videoCall.acceptor = function(id, stream) {
 
 	console.log("Call from " + id);
-
+	
+	var conversationId = id;
 	if (conversationList.get(id).waitingForGroupVideo) {
-		
-		groupId = conversationList.get(id).waitingForGroupVideo.id;
+		conversationId = conversationList.get(id).waitingForGroupVideo.id;
 	}
 
 	var addElementToWindow = function() {
 		console.log("Stage freeze!");
-		easyrtc.setVideoObjectSrc(conversationList.get(groupId).cameraWindow.createVideoElement(id), stream);
+		easyrtc.setVideoObjectSrc(conversationList.get(conversationId).cameraWindow.createVideoElement(id), stream);
 	}
-	if (!conversationList.get(groupId).cameraWindow.open) {
-		conversationList.get(groupId).cameraWindow.openWindow();
+	if (!conversationList.get(conversationId).cameraWindow.open) {
+		conversationList.get(conversationId).cameraWindow.openWindow();
 		window.setTimeout(addElementToWindow, 2000);
 	}
 	else addElementToWindow();
