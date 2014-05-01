@@ -2,7 +2,6 @@ var controller = {
 	friendSelectMode: false,
 	friendSelection: {},
 	id: "",
-	cameraWindow: {}
 }
 
 controller.setCurrentConversation = function(id) {
@@ -18,9 +17,9 @@ controller.updateGUI = function() {
 	}
 	else {
 		GUI.setButtonText("newGroupConversationButton", "<span class=\"glyphicon glyphicon-plus\"></span> New group conversation");
-	
+
 	}
-	
+
 	if (conversationList.getCurrentId()) {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
@@ -35,25 +34,25 @@ controller.updateGUI = function() {
 	else {
 		text += "";
 	}
-	
-	
+
+
 	GUI.setChatLabel(text);	
 	GUI.focusize();
 }
 
 controller.sendMessage = function() {
 	var message = GUI.getTextFromMessageField();
-	
+
 	if (!message.length || !conversationList.getCurrentId() || !conversationList.getCurrent().online) return;
-	
+
 	GUI.cleanMessageField();
-	
-	
+
+
 	if (conversationList.getCurrent().multi) {
 		var participants = conversationList.getCurrent().participants
-		for (var i in participants) {
-			if (conversationList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversationList.getCurrentId(), message);
-		}
+			for (var i in participants) {
+				if (conversationList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversationList.getCurrentId(), message);
+			}
 	}
 	else {
 		easyrtc.sendDataWS(conversationList.getCurrentId(), "message", message);
@@ -70,6 +69,12 @@ controller.receiveMessage = function(id, msgType, message) {
 	else if (msgType === "roomInvite") {
 		if (!conversationList.get(message)) easyrtc.joinRoom(message);
 	}
+	else if (msgType === "waitForVideo") {
+		conversationList.get(id).startVideoWaiting(message);	
+	}
+	else if (msgType === "stopWaitingForVideo") {
+		conversationList.get(id).stopVideoWaiting();
+	}
 	else {
 		if (conversationList.get(msgType)) {
 			GUI.notification(conversationList.get(id).username);
@@ -78,7 +83,6 @@ controller.receiveMessage = function(id, msgType, message) {
 	}
 	controller.updateGUI();
 }
-
 controller.addMessageToConversation = function(senderId, message, conversationId) {
 	conversationList.addMessage((conversationId ? conversationId : senderId), senderId, message);
 }
@@ -89,7 +93,7 @@ controller.selectGroupMembersButtonListener = function() {
 		if (Object.keys(controller.friendSelection).length !== 0) controller.createGroupConversation();
 		controller.setFriendSelectMode(false);
 	}
-	
+
 	else {
 		controller.setFriendSelectMode(true);
 	}
@@ -111,7 +115,7 @@ controller.setFriendSelectMode = function(enable) {
 	if (!enable) controller.friendSelection = {};
 	console.log("Friend select mode " + (enable? "activated" : "deactivated"));
 	controller.updateGUI();
-	
+
 }
 
 controller.toggleFriendSelect = function(id) {
@@ -154,9 +158,9 @@ controller.roomListener = function(roomName, friends) {
 controller.documentKeyListener = function(e) {
 	if (e.keyCode === 27) {
 		controller.setFriendSelectMode(false);
-		
+
 	}
-	
+
 }
 
 controller.closeConversation = function(conversationId) {
@@ -165,30 +169,50 @@ controller.closeConversation = function(conversationId) {
 	controller.updateGUI();
 }
 
+
+controller.signalVideoWaiting= function(id, conversationId) {
+	if (conversationId) easyrtc.sendDataWS(id, "waitForVideo", conversationId);
+	else easyrtc.sendDataWS(id, "stopWaitingForVideo");
+}
+
 controller.sendVideo = function() {
-	if (!conversationList.getCurrentId()) return;
-	
+	var conversation = conversationList.getCurrent();
+	if (!conversation) return;
 	easyrtc.enableVideo(true);
 
-	if (conversationList.getCurrent().multi) {
-		var participants = conversationList.getCurrent().participants;
-		for (var p in participants) {
-			controller.call(participants[p]);
+	if (conversation.multi) {
+		var participants = conversation.participants;
+
+		if (conversation.sendingVideo) {
+			for (var p in participants) {
+				easyrtc.hangup(participants[p]);
+			}
+			conversation.sendingVideo = false;
+		}
+		else {
+			for (var p in participants) {
+				controller.call(participants[p], conversation.id);
+			}
 		}
 	}
-	else controller.call(conversationList.getCurrentId());
-
-	
+	else {
+		if (conversation.sendingVideo) {
+		   	easyrtc.hangup(conversation.id);
+			conversation.sendingVideo = false;
+		}
+		else controller.call(conversation.id);
+	}
 	controller.updateGUI();
 }
-  
 
-controller.call = function(id) {
+
+controller.call = function(id, conversationId) {
 	console.log("Call to "  + conversationList.get(id));
 	if (!conversationList.get(id).online) {
 		console.log("Call failed, friend no longer online");
 		return;
 	}
+	controller.signalVideoWaiting(id, conversationId);
 	easyrtc.call(id,
 		function(otherCaller, mediaType) {
 			console.log("Call succesful - " + otherCaller + " - " + mediaType);
@@ -196,14 +220,23 @@ controller.call = function(id) {
 		function(errorCode, errMessage) {
 			console.log("Call failed - " + errorCode + " - " + errMessage);
 		},
-		function(wasAccepted, easyrtcid){
-			if( wasAccepted ){
-				console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+		function(){
+			return function(wasAccepted, easyrtcid) {
+				if(wasAccepted){
+					console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+					videoCall.storeStream(easyrtc.getLocalStream());
+					if (conversationId) {
+						conversationList.get(conversationId).sendingVideo = true;
+					}
+					else conversationList.get(easyrtcid).sendingVideo = true;
+				}
+				else{
+					console.log("call rejected" + easyrtc.idToName(easyrtcid));
+				}
+				if (conversationId) controller.signalVideoWaiting(easyrtcid);
+	
 			}
-			else{
-			  	console.log("call rejected" + easyrtc.idToName(easyrtcid));
-			}
-		}
+		}(conversationId)
 	);
 }
 

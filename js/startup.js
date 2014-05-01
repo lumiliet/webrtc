@@ -36,6 +36,3 @@ function start() {
 
 }
 
-function openCamWindow() {
-	controller.cameraWindow = window.open("","","width=400,height=400");	
-}

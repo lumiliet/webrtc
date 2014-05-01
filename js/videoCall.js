@@ -8,21 +8,37 @@ var videoCall = {
 
 videoCall.acceptor = function(id, stream) {
 
+	console.log("Call from " + id);
 
-	conversationList.get(id).video = true;
-	conversationList.get(id).stream = stream;
+	if (conversationList.get(id).waitingForGroupVideo) {
+		
+		groupId = conversationList.get(id).waitingForGroupVideo.id;
+	}
 
-	
-	easyrtc.setVideoObjectSrc(videoCall.createVideoElement(id), stream);
+	var addElementToWindow = function() {
+		console.log("Stage freeze!");
+		easyrtc.setVideoObjectSrc(conversationList.get(groupId).cameraWindow.createVideoElement(id), stream);
+	}
+	if (!conversationList.get(groupId).cameraWindow.open) {
+		conversationList.get(groupId).cameraWindow.openWindow();
+		window.setTimeout(addElementToWindow, 2000);
+	}
+	else addElementToWindow();
 }
 
 videoCall.disconnectListener = function(id) {
-	videoCall.deleteVideoElement(id);
+	if (conversationList.get(id).cameraWindow.open) conversationList.get(id).cameraWindow.closeWindow();
+
+	var groups = conversationList.get(id).participantIn;
+	for (var g in groups) {
+		var cameraWindow = conversationList.get(groups[g]).cameraWindow;
+		if (cameraWindow.open) {
+			cameraWindow.deleteVideoElement(id);
+			if (cameraWindow.videoElements === 0) cameraWindow.closeWindow();
+		}
+	}
 }
 
-videoCall.call = function() {
-
-}
 
 videoCall.enableCamera = function() {
 	easyrtc.initMediaSource(
@@ -38,22 +54,14 @@ videoCall.enableCamera = function() {
 		}
 	);
 }
+videoCall.storeStream = function(stream) {
+	videoCall.localVideo.stream = stream;
+	videoCall.localVideo.enabled = true;
+}
 
-videoCall.disableCamera = function() {
+videoCall.stopStream = function() {
 	videoCall.localVideo.stream.stop();
 	videoCall.localVideo.stream = {};
 	videoCall.localVideo.enabled = false;
 }
 
-videoCall.createVideoElement = function(id) {
-
-	var video = controller.cameraWindow.document.createElement("video");
-	video.id = "video_" + id;
-	controller.cameraWindow.document.body.appendChild(video);
-	return video;
-}
-
-videoCall.deleteVideoElement = function(id) {
-	var video = controller.cameraWindow.document.getElementById("video_" + id);
-	controller.cameraWindow.document.body.removeChild(video);
-}

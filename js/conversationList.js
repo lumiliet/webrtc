@@ -15,16 +15,49 @@ conversationList.new = function(id, multi) {
 		active: false,
 		unseen: 0,
 		audio: false,
-		video: false,
+		sendingVideo: false,
+		waitingForGroupVideo: {},
 		data: false,
-		stream: {},
 		visible: false,
 		online: true,
 		mostRecentTime: 0,
+		cameraWindow: {
+			
+			open: false,
+			videoElements: 0,
+
+			createVideoElement: function(id) {
+				var video = this.window.document.createElement("video");
+				video.id = "video_" + id;
+				this.window.document.body.appendChild(video);
+				this.videoElements++;
+				return video;
+			},
+			deleteVideoElement: function(id) {
+
+				var video = this.window.document.getElementById("video_" + id);
+				this.window.document.body.removeChild(video);
+				this.videoElements--;
+			},
+
+			openWindow: function() {
+				this.window = window.open("camera.html","_blank","width=660,height=500");
+				this.open = true;
+			},
+			closeWindow: function() {
+				this.window.close();
+				this.open = false;
+			},
+
+
+			window: {}
+		},
 
 
 		multi: (multi == true),
-		participants: []
+		participants: [],
+
+		participantIn: []
 	};
 
 	this.list[id].addMessage = function(senderId, message) {
@@ -47,6 +80,7 @@ conversationList.new = function(id, multi) {
 			if (this.participants[i] === id) return;
 		}
 		this.participants.push(id);
+		conversationList.get(id).addParticipantIn(this.id);
 	}
 	
 	this.list[id].isParticipant = function(id) {
@@ -56,7 +90,24 @@ conversationList.new = function(id, multi) {
 		return false;
 	}
 
+	this.list[id].addParticipantIn = function(groupConversationId) {
+		//for (var i = 0; i < this.participants.length; i++) {
+		//	if (this.participants[i] === id) return;
+		//}
+		this.participantIn.push(groupConversationId);
+	}
 
+	this.list[id].startVideoWaiting = function(groupConversationId) {
+		console.log("Wating for group video");
+		this.waitingForGroupVideo = {
+			id: groupConversationId
+		};
+	}
+
+	this.list[id].stopVideoWaiting = function() {
+		console.log("Stopped waiting for group video");
+		this.waitingForGroupVideo = {};
+	}
 	
 	this.list[id].toString = function() {
 		var out = "";
@@ -126,10 +177,6 @@ conversationList.conversationListener = function(id, participants) {
 	}
 }
 
-
-conversationList.addIdToGroup = function(id, groupid) {
-	this.get(groupid).participants.push(id);
-}
 
 conversationList.get = function(id) {
 	if (this.list[id]) return this.list[id];
