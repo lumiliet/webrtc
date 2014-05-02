@@ -27,6 +27,7 @@ videoCall.acceptor = function(id, stream) {
 }
 
 videoCall.disconnectListener = function(id) {
+	console.log(id + " disconnected from video chat");
 	if (conversationList.get(id).cameraWindow.open) conversationList.get(id).cameraWindow.closeWindow();
 
 	var groups = conversationList.get(id).participantIn;

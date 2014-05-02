@@ -204,11 +204,23 @@ controller.sendVideo = function() {
 	controller.updateGUI();
 }
 
-//use this. In a loop or something, remember concurrency
-controller.disableVideo = function() {
-	window.setTimout(function() {
-		easyrtc.enablevideo(false);
-	}, 1000);
+
+controller.countCalls = function(conversationId, increment) {
+	console.log("conversationId: " + conversationId);
+	var conversation = conversationList.get(conversationId);
+	if (increment) conversation.callCounter ++;
+	else conversation.callCounter --;
+	if (conversation.callCounter === 0) {
+		console.log("This should be 0: " + conversationList.get(conversationId).callCounter);
+		easyrtc.enableVideo(false);
+		console.log("Disable video");
+	}
+	else {
+		console.log("This should not be 0: " + conversationList.get(conversationId).callCounter);
+		console.log("This is not 0: " + conversation.callCounter);
+		easyrtc.enableVideo(true);
+		console.log("Enable video");
+	}
 }
 
 
@@ -218,10 +230,13 @@ controller.call = function(id, conversationId) {
 		console.log("Call failed, friend no longer online");
 		return;
 	}
-	controller.signalVideoWaiting(id, conversationId);
 	
-	//remove this line when you have a better solution
-	easyrtc.enableVideo(true);
+	if (conversationId) {
+		controller.signalVideoWaiting(id, conversationId);
+		controller.countCalls(conversationId, true);
+	}
+	else easyrtc.enableVideo(true);
+	
 	easyrtc.call(id,
 		function(otherCaller, mediaType) {
 			console.log("Call succesful - " + otherCaller + " - " + mediaType);
@@ -242,7 +257,11 @@ controller.call = function(id, conversationId) {
 				else{
 					console.log("call rejected" + easyrtc.idToName(easyrtcid));
 				}
-				if (conversationId) controller.signalVideoWaiting(easyrtcid);
+				if (conversationId) {
+				   	controller.signalVideoWaiting(easyrtcid);
+					controller.countCalls(conversationId, false);
+				}
+				else easyrtc.enableVideo(false);
 	
 			}
 		}(conversationId)

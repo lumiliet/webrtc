@@ -21,6 +21,7 @@ conversationList.new = function(id, multi) {
 		visible: false,
 		online: true,
 		mostRecentTime: 0,
+		callCounter: 0,
 		cameraWindow: {
 			
 			open: false,
