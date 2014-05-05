@@ -34,7 +34,7 @@ fileTransfer.saveFile = function(id, file, filename) {
 }
 
 fileTransfer.receiverStatus = function(id, msg) {
-	if (msg.status === "working") {
+	if (msg.status === "progress") {
 		var percent = (msg.received / msg.size) * 100;
 		GUI.updateProgressBar(percent);
 	}
@@ -166,6 +166,7 @@ fileTransfer.sendFiles = function() {
 fileTransfer.senderStatus = function(msg) {
 	if (msg.status === "working") {
 		var percent = (msg.position / msg.size) * 100;
+
 		GUI.updateProgressBar(percent);
 	}
 	if (msg.status === "done") GUI.updateProgressBar();
