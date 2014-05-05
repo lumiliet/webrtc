@@ -59,6 +59,7 @@ html, body {
 	left: 0px;
 	position: absolute;
 	margin: auto;
+	visibility: hidden;
 }
 
 .chatMessage {

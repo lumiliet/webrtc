@@ -23,6 +23,12 @@ controller.updateGUI = function() {
 	if (conversationList.getCurrentId()) {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
+		
+		if (conversationList.getCurrent().multi && conversationList.getCurrent().participants.length === 0) GUI.showVideoGlyph(false);
+		else GUI.showVideoGlyph(true);
+	}
+	else {
+		GUI.showVideoGlyph(false);
 	}
 	GUI.updateConversationList(conversationList.getAll());
 	GUI.updateFriendList();
@@ -154,8 +160,10 @@ controller.documentKeyListener = function(e) {
 }
 
 controller.closeConversation = function(conversationId) {
+	videoCall.disconnect(conversationId);
 	conversationList.closeConversation(conversationId);
 	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
+	if (conversationList.get(conversationId).multi) easyrtc.leaveRoom(conversationId);
 	controller.updateGUI();
 }
 
@@ -164,10 +172,5 @@ controller.signalVideoWaiting= function(id, conversationId) {
 	else easyrtc.sendDataWS(id, "stopWaitingForVideo");
 }
 
-controller.call = function(type) {
-	if (type === "video") {
-		videoCall.sendVideo();
-	}
-}
 
 

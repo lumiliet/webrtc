@@ -8,10 +8,7 @@ fileTransfer.dataChannelOpenListener = function(id){
 	controller.updateGUI();
 
 	if (fileTransfer.files) {
-		if (fileTransfer.conversation.multi) {
-			fileTransfer.countCalls(fileTransfer.conversation.id, false);
-		}
-		else fileTransfer.countCalls(fileTransfer.conversation.id, false);
+		fileTransfer.countCalls(fileTransfer.conversation.id, false);
 	}
 }
 
@@ -81,9 +78,11 @@ fileTransfer.connect = function() {
 		for (var p in participants) {
 			fileTransfer.call(participants[p], conversation.id);
 		}
+		fileTransfer.countCalls(conversation.id);
 	}
 	else {
 		fileTransfer.call(conversation.id);
+		fileTransfer.countCalls(conversation.id);
 	}
 	controller.updateGUI();
 }
@@ -92,6 +91,10 @@ fileTransfer.call = function(id, conversationId) {
 	console.log("Call to "  + conversationList.get(id));
 	if (!conversationList.get(id).online) {
 		console.log("Call failed, friend no longer online");
+		return;
+	}
+	if (conversationList.get(id).data) {
+		console.log("Data call already established");
 		return;
 	}
 
@@ -124,12 +127,13 @@ fileTransfer.call = function(id, conversationId) {
 
 fileTransfer.countCalls = function(conversationId, increment) {
 	var conversation = conversationList.get(conversationId);
-	if (increment) conversation.callCounter.file ++;
+	if (increment === undefined);
+	else if (increment) conversation.callCounter.file ++;
 	else conversation.callCounter.file --;
 	if (conversation.callCounter.file === 0) {
 		if (fileTransfer.files) {
 			fileTransfer.sendFiles();
-			fileTransfer.disconnect();
+			fileTransfer.finished();
 		}
 	}
 	else {
@@ -173,22 +177,7 @@ fileTransfer.senderStatus = function(msg) {
 }
 
 
-fileTransfer.disconnect = function() {
-	var conversation = fileTransfer.conversation;
-	if (!conversation) return;
-
-
-	if (conversation.multi) {
-		var participants = conversation.participants;
-
-		for (var p in participants) {
-			easyrtc.hangup(participants[p]);
-		}
-	}
-	else {
-		easyrtc.hangup(conversation.id);
-	}
-	controller.updateGUI();
+fileTransfer.finished= function() {
 
 	delete fileTransfer.files;
 	delete fileTransfer.conversation;

@@ -16,7 +16,6 @@ conversationList.newGroupConversation = function(conversationId) {
 	if (conversationId) id = conversationId;
 	else id = controller.id + "_" +  this.multiCounter++;
 	this.newConversation(id, true);
-	this.list[id].visible = true;
 	return this.list[id];
 }
 
@@ -24,6 +23,7 @@ conversationList.groupConversationListener = function(id, participants) {
 	if (!this.get(id)) {
 		this.newGroupConversation(id);
 	}
+	this.get(id).participants.length = 0;
 	for (var p in participants) {
 		this.get(id).addParticipant(p);
 	}

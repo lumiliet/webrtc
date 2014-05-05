@@ -15,7 +15,7 @@ GUI.setup = function() {
 	}
 
 	var startVideoGlyph = document.getElementById("startVideoGlyph");
-	startVideoGlyph.onclick = function() {controller.call("video");};
+	startVideoGlyph.onclick = videoCall.videoGlyphListener;
 
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {
@@ -286,6 +286,7 @@ GUI.createCameraWindow = function() {
 		deleteVideoElement: function(id) {
 
 			var video = this.window.document.getElementById("video_" + id);
+			if (!video) return;
 			this.window.document.body.removeChild(video);
 			this.videoElements--;
 		},
@@ -319,4 +320,10 @@ GUI.updateProgressBar = function(value) {
 		var progressBar = document.getElementById("progressBar");
 		progressBar.style.width = value + "%";
 	}
+}
+
+GUI.showVideoGlyph = function(show) {
+	var videoGlyph = document.getElementById("startVideoGlyph");
+	if (show) videoGlyph.style.visibility = "visible";
+	else  videoGlyph.style.visibility = "hidden";
 }

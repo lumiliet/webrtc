@@ -85,7 +85,7 @@ conversation.create = function(id, multi) {
 						if (i !== (this.participants.length -1)) out += ", ";
 					}
 				}
-				else out += "New group conversation";
+				else out += "Group conversation";
 			}
 			else {
 				out += this.username;
