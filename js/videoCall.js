@@ -1,8 +1,10 @@
 var videoCall = {
-	localVideo: {
+	localStream: {
 		stream: {},
 		enabled: false
-	}
+	},
+	busy: false,
+	connectionCounter: 0,
 }
 
 
@@ -24,8 +26,8 @@ videoCall.acceptor = function(id, stream) {
 		
 	}
 	if (!conversationList.get(conversationId).cameraWindow.open) {
-		conversationList.get(conversationId).cameraWindow.openWindow();
-		window.setTimeout(addElementToWindow, 2000);
+		console.log(conversationList.get(conversationId).cameraWindow.openWindow());
+		window.setTimeout(addElementToWindow, 1500);
 	}
 	else addElementToWindow();
 }
@@ -42,40 +44,50 @@ videoCall.disconnectListener = function(id) {
 			if (cameraWindow.videoElements === 0) cameraWindow.closeWindow();
 		}
 	}
+
+	videoCall.connectionCounter--;
+
+	if (videoCall.connectionCounter === 0) {
+		videoCall.stopLocalStream();
+	}
 }
 
-
-videoCall.enableCamera = function() {
-	easyrtc.initMediaSource(
-		function(){
-
-			videoCall.localVideo.stream = easyrtc.getLocalStream();
-			videoCall.localVideo.enabled = true;
-
-			easyrtc.setVideoObjectSrc( controller.cameraWindow.document.getElementById("videoSelf"), videoCall.localVideo.stream);
-		},
-		function(){
-			easyrtc.showError("no-media", "Unable to get local media");
-		}
-	);
+videoCall.setLocalStream = function(stream) {
+	videoCall.localStream.stream = stream;
+	videoCall.localStream.enabled = true;
 }
 
-videoCall.storeStream = function(stream) {
-	videoCall.localVideo.stream = stream;
-	videoCall.localVideo.enabled = true;
-}
-
-videoCall.stopStream = function() {
-	videoCall.localVideo.stream.stop();
-	videoCall.localVideo.stream = {};
-	videoCall.localVideo.enabled = false;
+videoCall.stopLocalStream = function() {
+	videoCall.localStream.stream.stop();
+	videoCall.localStream.stream = {};
+	videoCall.localStream.enabled = false;
 }
 
 
 videoCall.sendVideo = function() {
-	var conversation = conversationList.getCurrent();
-	if (!conversation) return;
+	if (!conversationList.getCurrent()) return;
+	if (videoCall.busy) return;
+	videoCall.busy = true;
 
+	if (!videoCall.localStream.enabled) {
+		easyrtc.enableVideo(true);
+		easyrtc.initMediaSource(
+			function(){
+				easyrtc.enableVideo(false);
+				videoCall.setLocalStream(easyrtc.getLocalStream());
+				videoCall.connect();
+
+			},
+			function(){
+				easyrtc.showError("no-media", "Unable to get local media");
+			}
+		);
+	}
+	else videoCall.connect();
+}
+
+videoCall.connect = function() {
+	var conversation = conversationList.getCurrent();
 	if (conversation.multi) {
 		var participants = conversation.participants;
 
@@ -84,6 +96,7 @@ videoCall.sendVideo = function() {
 				easyrtc.hangup(participants[p]);
 			}
 			conversation.sendingVideo = false;
+			videoCall.busy = false;
 		}
 		else {
 			for (var p in participants) {
@@ -93,22 +106,21 @@ videoCall.sendVideo = function() {
 	}
 	else {
 		if (conversation.sendingVideo) {
-		   	easyrtc.hangup(conversation.id);
+			easyrtc.hangup(conversation.id);
 			conversation.sendingVideo = false;
+			videoCall.busy = false;
 		}
 		else videoCall.call(conversation.id);
 	}
-	controller.updateGUI();
-}
-
+}	
 
 videoCall.countCalls = function(conversationId, increment) {
-	console.log("Counting video calls for conversationId: " + conversationId);
 	var conversation = conversationList.get(conversationId);
 	if (increment) conversation.callCounter.video ++;
 	else conversation.callCounter.video --;
 	if (conversation.callCounter.video === 0) {
 		easyrtc.enableVideo(false);
+		videoCall.busy = false;
 	}
 	else {
 		easyrtc.enableVideo(true);
@@ -127,7 +139,7 @@ videoCall.call = function(id, conversationId) {
 		controller.signalVideoWaiting(id, conversationId);
 		videoCall.countCalls(conversationId, true);
 	}
-	else easyrtc.enableVideo(true);
+	else videoCall.countCalls(id, true);
 	
 	easyrtc.call(id,
 		function(otherCaller, mediaType) {
@@ -140,7 +152,8 @@ videoCall.call = function(id, conversationId) {
 			return function(wasAccepted, easyrtcid) {
 				if(wasAccepted){
 					console.log("call accepted by " + easyrtc.idToName(easyrtcid));
-					videoCall.storeStream(easyrtc.getLocalStream());
+					videoCall.connectionCounter++;
+					videoCall.setLocalStream(easyrtc.getLocalStream());
 					if (conversationId) {
 						conversationList.get(conversationId).sendingVideo = true;
 					}
@@ -153,7 +166,7 @@ videoCall.call = function(id, conversationId) {
 				   	controller.signalVideoWaiting(easyrtcid);
 					videoCall.countCalls(conversationId, false);
 				}
-				else easyrtc.enableVideo(false);
+				else videoCall.countCalls(id, false);
 	
 			}
 		}(conversationId)

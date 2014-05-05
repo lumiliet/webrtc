@@ -103,23 +103,23 @@ fileTransfer.call = function(id, conversationId) {
 	}
 
 	easyrtc.call(id,
-			function(otherCaller, mediaType) {
-				console.log("Call succesful - " + otherCaller + " - " + mediaType);
-			},
-			function(errorCode, errMessage) {
-				console.log("Call failed - " + errorCode + " - " + errMessage);
-			},
-			function(){
-				return function(wasAccepted, easyrtcid) {
-					if(wasAccepted){
-						console.log("call accepted by " + easyrtc.idToName(easyrtcid));
-					}
-					else{
-						console.log("call rejected" + easyrtc.idToName(easyrtcid));
-					}
+		function(otherCaller, mediaType) {
+			console.log("Call succesful - " + otherCaller + " - " + mediaType);
+		},
+		function(errorCode, errMessage) {
+			console.log("Call failed - " + errorCode + " - " + errMessage);
+		},
+		function(){
+			return function(wasAccepted, easyrtcid) {
+				if(wasAccepted){
+					console.log("call accepted by " + easyrtc.idToName(easyrtcid));
 				}
-			}(conversationId)
-			);
+				else{
+					console.log("call rejected" + easyrtc.idToName(easyrtcid));
+				}
+			}
+		}(conversationId)
+	);
 }
 
 fileTransfer.countCalls = function(conversationId, increment) {

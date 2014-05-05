@@ -4,7 +4,7 @@ var conversationList = {
 	currentId: ""
 }
 
-conversationList.create = function(id, multi) {	
+conversationList.newConversation = function(id, multi) {	
 	if (this.list[id]) return;
 	if (typeof(id) !== "string") return;
 	
@@ -15,12 +15,12 @@ conversationList.newGroupConversation = function(conversationId) {
 	var id;
 	if (conversationId) id = conversationId;
 	else id = controller.id + "_" +  this.multiCounter++;
-	this.create(id, true);
+	this.newConversation(id, true);
 	this.list[id].visible = true;
 	return this.list[id];
 }
 
-conversationList.conversationListener = function(id, participants) {
+conversationList.groupConversationListener = function(id, participants) {
 	if (!this.get(id)) {
 		this.newGroupConversation(id);
 	}
@@ -63,7 +63,7 @@ conversationList.setCurrent = function(id) {
 		this.list[id].unseen = 0;
 	}
 	else {
-		this.create(id);
+		this.newConversation(id);
 		this.list[id].active = true;
 		this.list[id].unseen = 0;
 	}
@@ -78,10 +78,9 @@ conversationList.setCurrent = function(id) {
 
 conversationList.updateFriends = function(friends) {
 	for (var id in friends) {
-		if (!this.list[id]) this.create(id);
+		if (!this.list[id]) this.newConversation(id);
 	}
 }
-
 
 conversationList.updateOnlineFriends = function(friends) {
 	for (var id in this.list) {

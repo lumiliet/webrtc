@@ -123,7 +123,6 @@ controller.toggleFriendSelect = function(id) {
 	if (controller.friendSelection[id]) delete controller.friendSelection[id];
 	else controller.friendSelection[id] = {};
 
-	console.log(controller.friendSelection);
 }
 
 controller.isFriendSelected = function(id) {
@@ -142,7 +141,7 @@ controller.roomListener = function(roomName, friends) {
 		controller.updateGUI();
 	}
 	else {
-		conversationList.conversationListener(roomName, friends);
+		conversationList.groupConversationListener(roomName, friends);
 	}
 	conversationList.updateFriends(friends);
 	controller.updateGUI();
