@@ -23,7 +23,12 @@ fileTransfer.startup = function() {
 }
 
 fileTransfer.accept = function(id, fileNameList, wasAccepted) {
-	wasAccepted(true);
+	if (fileTransfer.busy) wasAccepted(false);
+	else {
+		wasAccepted(true);
+		fileTransfer.busy = true;
+	}
+
 }
 
 fileTransfer.saveFile = function(id, file, filename) {
@@ -35,7 +40,10 @@ fileTransfer.receiverStatus = function(id, msg) {
 		var percent = (msg.received / msg.size) * 100;
 		GUI.updateProgressBar(percent);
 	}
-	else if (msg.status === "done")	GUI.updateProgressBar();
+	else if (msg.status === "done") {
+		GUI.updateProgressBar();
+		fileTransfer.busy = false;
+	}
 }
 
 fileTransfer.handleDragOver = function(evt) {
@@ -65,7 +73,7 @@ fileTransfer.handleDrop = function(evt) {
 
 
 fileTransfer.connect = function() {
-	if (fileTransfer.busy) return;
+	if (fileTransfer.busy || videoCall.busy) return;
 	fileTransfer.busy = true;
 
 	var conversation = conversationList.getCurrent();
@@ -172,7 +180,14 @@ fileTransfer.senderStatus = function(msg) {
 
 		GUI.updateProgressBar(percent);
 	}
-	if (msg.status === "done") GUI.updateProgressBar();
+	else if (msg.status === "done") {
+		GUI.updateProgressBar();
+		fileTransfer.busy = false;
+	}
+	else if (msg.status === "rejected") {
+		console.log("File rejected");
+		fileTransfer.busy = false;
+	}
 	return true;
 }
 
@@ -182,6 +197,5 @@ fileTransfer.finished= function() {
 	delete fileTransfer.files;
 	delete fileTransfer.conversation;
 
-	fileTransfer.busy = false;
 }
 

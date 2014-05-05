@@ -85,13 +85,14 @@ videoCall.stopLocalStream = function() {
 }
 
 videoCall.videoGlyphListener = function() {
+	if (fileTransfer.busy || videoCall.busy) return;
 	if (conversationList.getCurrent().sendingVideo) videoCall.disconnect();
 	else videoCall.sendVideo();
 }
 
 videoCall.sendVideo = function() {
 	if (!conversationList.getCurrent()) return;
-	if (videoCall.busy) return;
+	if (fileTransfer.busy || videoCall.busy) return;
 	videoCall.busy = true;
 
 	if (!videoCall.localStream.enabled) {
@@ -133,7 +134,6 @@ videoCall.connect = function() {
 videoCall.disconnect = function(conversationId) {
 	var conversation = (conversationId ? conversationList.get(conversationId) : conversationList.getCurrent());
 	if (!conversation) return;
-
 	if (conversation.multi) {
 		var participants = conversation.participants;
 

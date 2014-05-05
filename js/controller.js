@@ -160,6 +160,7 @@ controller.documentKeyListener = function(e) {
 }
 
 controller.closeConversation = function(conversationId) {
+	if (fileTransfer.busy) return;
 	videoCall.disconnect(conversationId);
 	conversationList.closeConversation(conversationId);
 	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
