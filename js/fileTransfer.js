@@ -123,7 +123,6 @@ fileTransfer.call = function(id, conversationId) {
 }
 
 fileTransfer.countCalls = function(conversationId, increment) {
-	console.log("counting file calls for conversationId: " + conversationId);
 	var conversation = conversationList.get(conversationId);
 	if (increment) conversation.callCounter.file ++;
 	else conversation.callCounter.file --;

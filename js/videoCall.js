@@ -26,7 +26,7 @@ videoCall.acceptor = function(id, stream) {
 		
 	}
 	if (!conversationList.get(conversationId).cameraWindow.open) {
-		console.log(conversationList.get(conversationId).cameraWindow.openWindow());
+		conversationList.get(conversationId).cameraWindow.openWindow();
 		window.setTimeout(addElementToWindow, 1500);
 	}
 	else addElementToWindow();
