@@ -11,6 +11,7 @@
 <script type="text/javascript" src="js/conversationList.js"></script>
 <script type="text/javascript" src="js/fileTransfer.js"></script>
 <script type="text/javascript" src="js/videoCall.js"></script>
+<script type="text/javascript" src="js/conversation.js"></script>
 
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
@@ -23,48 +24,55 @@
 </head>
 <body onload="start()">
 
-	<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-		<div class="container">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#"><img src="uninett-bootstrap-theme/uninett-theme/images/UNINETT_logo.svg" alt="Uninett logo" type="image/svg+xml"></a>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#"><img src="uninett-bootstrap-theme/uninett-theme/images/UNINETT_logo.svg" alt="Uninett logo" type="image/svg+xml"></a>
 
+		</div>
+		<div class="navbar-department">
+			<div class="department">Chat</div>
+		</div>
+
+	</div>
+</div>
+
+<div class="container fill">
+	<div id="mainContainer" class="row">
+		<div class="col-xs-3 fill">
+			<div class="uninett-color-lightBlue gutterFill ">
+				<div id="leftLabel">History</div>
+				<div id="conversationList"></div>
+				<div id="glyphs">
+					<span id="startVideoGlyph" class="glyph glyphicon glyphicon-facetime-video"></span>
+				</div>
 			</div>
-			<div class="navbar-department">
-				<div class="department">Chat</div>
+		</div>
+
+		<div class="col-xs-6 fill">
+			<div class="uninett-color-lightGreen  gutterFill">
+				<div id="midLabel"></div>
+				<div id="chatArea"> </div>
+				<input type="text" id="sendMessageField">
+			</div>
+		</div>
+
+		<div class="col-xs-3 fill">
+			<div class="uninett-color-orange gutterFill">
+				<div id="rightLabel">Friends online</div>
+				<div id="friendList"></div>
+				<button type="button" id="newGroupConversationButton" class="btn btn-default ">
+					<span class="glyphicon glyphicon-plus"></span> New group conversation
+				</button>
 			</div>
 		</div>
 	</div>
 
-	<div class="container fill">
-		<div class="row fill">
-			<div class="col-xs-3 fill">
-				<div class="uninett-color-lightBlue gutterFill ">
-					<div id="leftLabel">History</div>
-					<div id="conversationList"></div>
-					<div id="glyphs">
-						<span id="startVideoGlyph" class="glyph glyphicon glyphicon-facetime-video"></span>
-					</div>
-				</div>
-			</div>
-
-			<div class="col-xs-6 fill">
-				<div class="uninett-color-lightGreen  gutterFill">
-					<div id="midLabel"></div>
-					<div id="chatArea"> </div>
-					<input type="text" id="sendMessageField">
-				</div>
-			</div>
-
-			<div class="col-xs-3 fill">
-				<div class="uninett-color-orange gutterFill">
-					<div id="rightLabel">Friends online</div>
-					<div id="friendList"></div>
-					<button type="button" id="newGroupConversationButton" class="btn btn-default ">
-						<span class="glyphicon glyphicon-plus"></span> New group conversation
-					</button>
-				</div>
-			</div>
+	<div id="progressBarContainer" class="progress hidden">
+		<div id="progressBar" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
 		</div>
 	</div>
+
+</div>
 </body>
 

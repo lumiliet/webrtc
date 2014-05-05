@@ -4,167 +4,18 @@ var conversationList = {
 	currentId: ""
 }
 
-conversationList.new = function(id, multi) {	
+conversationList.create = function(id, multi) {	
 	if (this.list[id]) return;
 	if (typeof(id) !== "string") return;
 	
-	this.list[id] = {
-		messages: [],
-		id: id,
-		username: easyrtc.idToName(id),
-		active: false,
-		unseen: 0,
-		audio: false,
-		sendingVideo: false,
-		waitingForGroupVideo: null,
-		data: false,
-		visible: false,
-		online: true,
-		mostRecentTime: 0,
-		callCounter: 0,
-		cameraWindow: {
-			
-			open: false,
-			videoElements: 0,
-
-			createVideoElement: function(id) {
-				var video = this.window.document.createElement("video");
-				video.id = "video_" + id;
-				this.window.document.body.appendChild(video);
-				this.videoElements++;
-				return video;
-			},
-			deleteVideoElement: function(id) {
-
-				var video = this.window.document.getElementById("video_" + id);
-				this.window.document.body.removeChild(video);
-				this.videoElements--;
-			},
-
-			openWindow: function() {
-				this.window = window.open("camera.html","_blank","width=660,height=500");
-				this.open = true;
-			},
-			closeWindow: function() {
-				this.window.close();
-				this.open = false;
-			},
-
-
-			window: {}
-		},
-
-
-		multi: (multi == true),
-		participants: [],
-
-		participantIn: []
-	};
-
-	this.list[id].addMessage = function(senderId, message) {
-		this.messages.push(
-			{
-				senderId: senderId,
-				sender: (conversationList.get(senderId) ? conversationList.get(senderId).username : "Me"),
-				message: message,
-				time: function() {
-					var date = new Date();
-					conversationList.list[id].mostRecentTime = date.getTime();
-					return date.getTime();
-				}()
-			}
-		);
-	}
-
-	this.list[id].addParticipant = function(id) {
-		for (var i = 0; i < this.participants.length; i++) {
-			if (this.participants[i] === id) return;
-		}
-		this.participants.push(id);
-		conversationList.get(id).addParticipantIn(this.id);
-	}
-	
-	this.list[id].isParticipant = function(id) {
-		for (var i = 0; i < this.participants.length; i++) {
-			if (this.participants[i] === id) return true;
-		}
-		return false;
-	}
-
-	this.list[id].addParticipantIn = function(groupConversationId) {
-		//for (var i = 0; i < this.participants.length; i++) {
-		//	if (this.participants[i] === id) return;
-		//}
-		this.participantIn.push(groupConversationId);
-	}
-
-	this.list[id].startVideoWaiting = function(groupConversationId) {
-		console.log("Wating for group video");
-		this.waitingForGroupVideo = {
-			id: groupConversationId
-		};
-	}
-
-	this.list[id].stopVideoWaiting = function() {
-		console.log("Stopped waiting for group video");
-		this.waitingForGroupVideo = null;
-	}
-	
-	this.list[id].toString = function() {
-		var out = "";
-		if (this.unseen) {
-			out += "(" + this.unseen + ") ";
-		}
-		
-		if (this.multi) {
-			if (this.participants.length) {
-				out += "Group: ";
-				for (var i = 0; i < this.participants.length; i++) {
-					out += conversationList.get(this.participants[i]).username;
-					if (i !== (this.participants.length -1)) out += ", ";
-				}
-			}
-			else out += "New group conversation";
-		}
-		else {
-			out += this.username;
-		}
-		
-		
-		return out;
-	}
-	
-	this.list[id].toStringTitle = function() {
-		var out = "";
-		if (this.multi) {
-			if (this.participants.length) {
-				out += "You are talking to ";
-				for (var i = 0; i < this.participants.length; i++) {
-					out += conversationList.get(this.participants[i]).username;
-					if (!conversationList.get(this.participants[i]).online) out += " (offline)";
-					if (i === (this.participants.length - 2)) out += " and ";
-					else if (i !== (this.participants.length -1)) out += ", ";
-				}
-			}
-			else {
-				out += "You are alone";
-			}
-		}
-		else {
-			if (!this.online) out += this.username + " is offline";
-			else out += "You are talking to " + this.username;
-		}
-		return out;
-	}
-	
-
+	this.list[id] = conversation.create(id, multi);
 }
 
 conversationList.newGroupConversation = function(conversationId) {
 	var id;
 	if (conversationId) id = conversationId;
 	else id = controller.id + "_" +  this.multiCounter++;
-	this.new(id, true);
+	this.create(id, true);
 	this.list[id].visible = true;
 	return this.list[id];
 }
@@ -177,7 +28,6 @@ conversationList.conversationListener = function(id, participants) {
 		this.get(id).addParticipant(p);
 	}
 }
-
 
 conversationList.get = function(id) {
 	if (this.list[id]) return this.list[id];
@@ -213,7 +63,7 @@ conversationList.setCurrent = function(id) {
 		this.list[id].unseen = 0;
 	}
 	else {
-		this.new(id);
+		this.create(id);
 		this.list[id].active = true;
 		this.list[id].unseen = 0;
 	}
@@ -224,13 +74,11 @@ conversationList.setCurrent = function(id) {
 		this.list[id].visible = true;
 		this.list[id].mostRecentTime = (new Date()).getTime();
 	}
-
-
 }
 
 conversationList.updateFriends = function(friends) {
 	for (var id in friends) {
-		if (!this.list[id]) this.new(id);
+		if (!this.list[id]) this.create(id);
 	}
 }
 

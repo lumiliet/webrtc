@@ -1,78 +1,198 @@
-var fileTransfer = {};
+var fileTransfer = {
+	busy: false
+};
 
-
-controller.dataChannelOpenListener = function(id){
+fileTransfer.dataChannelOpenListener = function(id){
 	console.log("Data channel established " + id);
 	conversationList.get(id).data = true;
 	controller.updateGUI();
+
+	if (fileTransfer.files) {
+		if (fileTransfer.conversation.multi) {
+			fileTransfer.countCalls(fileTransfer.conversation.id, false);
+		}
+		else fileTransfer.countCalls(fileTransfer.conversation.id, false);
+	}
 }
 
-controller.dataChannelCloseListener = function(id) {
+fileTransfer.dataChannelCloseListener = function(id) {
 	console.log("Data channel closed " + id);
 	conversationList.get(id).data = false;
 	controller.updateGUI();
 }
 
 fileTransfer.startup = function() {
-	easyrtc_ft.buildFileReceiver(fileTransfer.accept, fileTransfer.saveFile, fileTransfer.receiveStatus);
-}
-
-fileTransfer.sendFiles = function(files) {
-	var fileSender;
-	if (conversationList.getCurrent().data) {
-		if (conversationList.getCurrent().multi) {
-			var participants = conversationList.getCurrent().participants;
-			for (var i in participants) {
-				if (conversationList.get(participants[i]).data) {
-					fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrent().participants[i]);
-					fileSender(files, true);
-				}
-				else {
-					console.log("No datachannel exists with " + conversationList.getCurrent().participants[i]);
-				}
-			}
-		}
-		else {
-			fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrentId());
-			fileSender(files, true);
-		}
-	}
+	easyrtc_ft.buildFileReceiver(fileTransfer.accept, fileTransfer.saveFile, fileTransfer.receiverStatus);
 }
 
 fileTransfer.accept = function(id, fileNameList, wasAccepted) {
-    wasAccepted(true);
-}
-
-fileTransfer.receiveStatus = function(id, msg) {
-    //return true;
+	wasAccepted(true);
 }
 
 fileTransfer.saveFile = function(id, file, filename) {
-    easyrtc_ft.saveAs(file, filename);
+	easyrtc_ft.saveAs(file, filename);
+}
+
+fileTransfer.receiverStatus = function(id, msg) {
+	if (msg.status === "working") {
+		var percent = (msg.received / msg.size) * 100;
+		GUI.updateProgressBar(percent);
+	}
+	else if (msg.status === "done")	GUI.updateProgressBar();
+}
+
+fileTransfer.handleDragOver = function(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+	evt.dataTransfer.dropEffect = 'copy';
 }
 
 fileTransfer.sendFileChangeListener = function(evt) {
 	var files = [];
 	files.push(evt.target.files[0]);
-	
-	fileTransfer.sendFiles(files);
-	
+
+	fileTransfer.files = files;
+	fileTransfer.connect();
 }
 
 fileTransfer.handleDrop = function(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
+	evt.stopPropagation();
+	evt.preventDefault();
 
-    var files = [];
+	var files = [];
 	files.push(evt.dataTransfer.files[0]);
 
-	fileTransfer.sendFiles(files);
+	fileTransfer.files = files;
+	fileTransfer.connect();
 }
 
-	
-fileTransfer.handleDragOver = function(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy';
+
+fileTransfer.connect = function() {
+	if (fileTransfer.busy) return;
+	fileTransfer.busy = true;
+
+	var conversation = conversationList.getCurrent();
+	if (!conversation) return;
+	fileTransfer.conversation = conversation;
+
+	if (conversation.multi) {
+		var participants = conversation.participants;
+
+		for (var p in participants) {
+			fileTransfer.call(participants[p], conversation.id);
+		}
+	}
+	else {
+		fileTransfer.call(conversation.id);
+	}
+	controller.updateGUI();
+}
+
+fileTransfer.call = function(id, conversationId) {
+	console.log("Call to "  + conversationList.get(id));
+	if (!conversationList.get(id).online) {
+		console.log("Call failed, friend no longer online");
+		return;
+	}
+
+	if (conversationId) {
+		fileTransfer.countCalls(conversationId, true);
+	}
+	else {
+		fileTransfer.countCalls(id, true);
+	}
+
+	easyrtc.call(id,
+			function(otherCaller, mediaType) {
+				console.log("Call succesful - " + otherCaller + " - " + mediaType);
+			},
+			function(errorCode, errMessage) {
+				console.log("Call failed - " + errorCode + " - " + errMessage);
+			},
+			function(){
+				return function(wasAccepted, easyrtcid) {
+					if(wasAccepted){
+						console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+					}
+					else{
+						console.log("call rejected" + easyrtc.idToName(easyrtcid));
+					}
+				}
+			}(conversationId)
+			);
+}
+
+fileTransfer.countCalls = function(conversationId, increment) {
+	console.log("counting file calls for conversationId: " + conversationId);
+	var conversation = conversationList.get(conversationId);
+	if (increment) conversation.callCounter.file ++;
+	else conversation.callCounter.file --;
+	if (conversation.callCounter.file === 0) {
+		if (fileTransfer.files) {
+			fileTransfer.sendFiles();
+			fileTransfer.disconnect();
+		}
+	}
+	else {
+	}
+}
+
+fileTransfer.sendFiles = function() {
+	var files = fileTransfer.files;
+	if (!files) return;
+
+	var conversation = fileTransfer.conversation;
+
+	var fileSender;
+	if (conversation.multi) {
+		var participants = conversation.participants;
+		for (var i in participants) {
+			if (conversationList.get(participants[i]).data) {
+				fileSender = easyrtc_ft.buildFileSender(conversation.participants[i], fileTransfer.senderStatus);
+				fileSender(files, true);
+			}
+			else {
+				console.log("No datachannel exists with " + conversation.participants[i]);
+			}
+		}
+	}
+	else if (conversation.data) {
+		fileSender = easyrtc_ft.buildFileSender(conversationList.getCurrentId(), fileTransfer.senderStatus);
+		fileSender(files, true);
+	}
+
+}
+
+fileTransfer.senderStatus = function(msg) {
+	if (msg.status === "working") {
+		var percent = (msg.position / msg.size) * 100;
+		GUI.updateProgressBar(percent);
+	}
+	if (msg.status === "done") GUI.updateProgressBar();
+	return true;
+}
+
+
+fileTransfer.disconnect = function() {
+	var conversation = fileTransfer.conversation;
+	if (!conversation) return;
+
+
+	if (conversation.multi) {
+		var participants = conversation.participants;
+
+		for (var p in participants) {
+			easyrtc.hangup(participants[p]);
+		}
+	}
+	else {
+		easyrtc.hangup(conversation.id);
+	}
+	controller.updateGUI();
+
+	delete fileTransfer.files;
+	delete fileTransfer.conversation;
+
+	fileTransfer.busy = false;
 }
 

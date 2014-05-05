@@ -133,6 +133,22 @@ html, body {
 	cursor: pointer;
 }
 
+#progressBarContainer {
+	height: 20px;
+}
+
+#progressBarContainer.hidden {
+	display: none;	
+}
+
+#mainContainer{
+	height: 100%;
+}
+
+#mainContainer.smaller {
+	height: calc(100% - 40px);
+}
+
 
 
 /*

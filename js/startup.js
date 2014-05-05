@@ -7,7 +7,7 @@ function start() {
 	easyrtc.enableVideo(false);
 	easyrtc.enableVideoReceive(true);
 	easyrtc.enableAudio(false);
-	easyrtc.enableDataChannels(false);
+	easyrtc.enableDataChannels(true);
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
@@ -24,8 +24,8 @@ function start() {
 		}
 	);
 	
-	easyrtc.setDataChannelOpenListener(controller.dataChannelOpenListener);
-	easyrtc.setDataChannelCloseListener(controller.dataChannelCloseListener);
+	easyrtc.setDataChannelOpenListener(fileTransfer.dataChannelOpenListener);
+	easyrtc.setDataChannelCloseListener(fileTransfer.dataChannelCloseListener);
 	
 	easyrtc.setStreamAcceptor(videoCall.acceptor);
 	easyrtc.setOnStreamClosed(videoCall.disconnectListener);

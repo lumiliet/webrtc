@@ -15,7 +15,7 @@ GUI.setup = function() {
 	}
 
 	var startVideoGlyph = document.getElementById("startVideoGlyph");
-	startVideoGlyph.onclick = function() {controller.sendVideo();};
+	startVideoGlyph.onclick = function() {controller.call("video");};
 
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {
@@ -27,7 +27,6 @@ GUI.setup = function() {
 	dropZone.addEventListener('drop', fileTransfer.handleDrop);
 
 	document.onkeyup = controller.documentKeyListener;
-
 
 	document.title = GUI.documentTitle;
 
@@ -191,7 +190,7 @@ GUI.updateFriendList = function(friends) {
 			var untickedGlyph = document.createElement("span");
 
 			if (controller.isFriendSelected(id)) {
-			
+
 				untickedGlyph.className = "glyph glyphicon glyphicon-check";
 			}
 			else {
@@ -228,7 +227,7 @@ GUI.updateFriendList = function(friends) {
 
 			startChatButton.onclick = function(id) {
 				return function() {
-					controller.friendClickListener(id);
+					controller.setCurrentConversation(id);
 				}
 			}(id);
 
@@ -251,30 +250,9 @@ GUI.updateFriendList = function(friends) {
 			}(glyphs);
 
 		}
-
-
-
 		friend.appendChild(glyphs);
 
 		friendList.appendChild(friend);
-	}
-}
-
-
-GUI.toggleVideo = function(visible) {
-	if (GUI.videoVisible === visible) return;
-	var videoChat = document.getElementById("videoContainer");
-	var chatArea = document.getElementById("chatArea");
-
-	if (!GUI.videoVisible) {
-		videoChat.className = "videoShown";
-		chatArea.className = "smallChat";
-		GUI.videoVisible = true;
-	}
-	else {
-		videoChat.className = "videoHidden";
-		chatArea.className = "largeChat";
-		GUI.videoVisible = false;
 	}
 }
 
@@ -293,3 +271,52 @@ GUI.generateMessageHTML = function(message) {
 	return messageLabel.outerHTML;
 }
 
+GUI.createCameraWindow = function() {
+	return {
+		open: false,
+		videoElements: 0,
+
+		createVideoElement: function(id) {
+			var video = this.window.document.createElement("video");
+			video.id = "video_" + id;
+			this.window.document.body.appendChild(video);
+			this.videoElements++;
+			return video;
+		},
+		deleteVideoElement: function(id) {
+
+			var video = this.window.document.getElementById("video_" + id);
+			this.window.document.body.removeChild(video);
+			this.videoElements--;
+		},
+
+		openWindow: function() {
+			this.window = window.open("cameraWindow.html","_blank","width=660,height=500");
+			this.open = true;
+		},
+		closeWindow: function() {
+			this.window.close();
+			this.open = false;
+		},
+		setTitle: function(title) {
+			this.window.document.title = title;
+		},
+
+
+		window: {}
+	};
+}
+
+GUI.updateProgressBar = function(value) {
+	var progressBarContainer = document.getElementById("progressBarContainer");
+	if (!value) {
+		progressBarContainer.className = "progress hidden";
+		document.getElementById("mainContainer").className = "row";
+	}
+	else {
+		progressBarContainer.className = "progress";
+		document.getElementById("mainContainer").className = "row smaller";
+		var progressBar = document.getElementById("progressBar");
+		progressBar.style.width = value + "%";
+	}
+}
