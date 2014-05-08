@@ -4,70 +4,31 @@ var videoCall = {
 		enabled: false
 	},
 	busy: false,
-	connectionCounter: {
-		value: 0,
-		increment: function() {
-			this.value++;
-			console.log("connectionCounter: " + this.value);
-		},
-		decrement: function() {
-			this.value--;
-			console.log("connectionCounter: " + this.value);
-			if (this.value === 0) {
-				videoCall.stopLocalStream();
-			}
-		}
-	},
 	sendingVideoTo: {},
 }
 
 
 videoCall.acceptor = function(id, stream) {
 
-	console.log("Call from " + conversationList.get(id).username);
+	console.log("Call from " + friendList.get(id).username);
 	
-	conversationList.get(id).video = true;
+	friendList.get(id).video = true;
 
-	var conversationId = id;
-	if (conversationList.get(id).waitingForGroupVideo) {
-		conversationId = conversationList.get(id).waitingForGroupVideo.id;
-	}
-	controller.setCurrentConversation(conversationId);
 
-	var addElementToWindow = function() {
-		console.log("Stage freeze!");
+	/* fix this
 		var cameraWindow = conversationList.get(conversationId).cameraWindow;
 		easyrtc.setVideoObjectSrc(cameraWindow.createVideoElement(id), stream);
 		cameraWindow.setTitle(conversationList.get(conversationId).toString());
+	*/
 		
-	}
-	if (!conversationList.get(conversationId).cameraWindow.open) {
-		conversationList.get(conversationId).cameraWindow.openWindow();
-		window.setTimeout(addElementToWindow, 1500);
-	}
-	else addElementToWindow();
 }
 
 videoCall.disconnectListener = function(id) {
 	console.log(conversationList.get(id).username + " disconnected from video chat");
 
-	if (conversationList.get(id).cameraWindow.open) conversationList.get(id).cameraWindow.closeWindow();
-
-	if (conversationList.get(id).video) {
-		var groups = conversationList.get(id).participantIn;
-		for (var g in groups) {
-			var cameraWindow = conversationList.get(groups[g]).cameraWindow;
-			if (cameraWindow.open) {
-				console.log("trying to delete " + id);
-				cameraWindow.deleteVideoElement(id);
-				if (cameraWindow.videoElements === 0) cameraWindow.closeWindow();
-			}
-		}
-	}
-	conversationList.get(id).video = false;
+	friendList.get(id).video = false;
 
 	if (videoCall.sendingVideoTo[id]) {
-		videoCall.connectionCounter.decrement();
 		delete videoCall.sendingVideoTo[id];
 	}
 
@@ -82,12 +43,6 @@ videoCall.stopLocalStream = function() {
 	videoCall.localStream.stream.stop();
 	videoCall.localStream.stream = {};
 	videoCall.localStream.enabled = false;
-}
-
-videoCall.videoGlyphListener = function() {
-	if (fileTransfer.busy || videoCall.busy) return;
-	if (conversationList.getCurrent().sendingVideo) videoCall.disconnect();
-	else videoCall.sendVideo();
 }
 
 videoCall.sendVideo = function() {
@@ -153,9 +108,9 @@ videoCall.disconnect = function(conversationId) {
 
 videoCall.countCalls = function(conversationId, increment) {
 	var conversation = conversationList.get(conversationId);
-	if (increment) conversation.callCounter.video ++;
-	else conversation.callCounter.video --;
-	if (conversation.callCounter.video === 0) {
+	if (increment) conversation.callCounter.audiovideo ++;
+	else conversation.callCounter.audiovideo --;
+	if (conversation.callCounter.audiovideo === 0) {
 		videoCall.enableSource(false);
 		videoCall.busy = false;
 	}
@@ -194,7 +149,6 @@ videoCall.call = function(id, conversationId) {
 				if(wasAccepted){
 					console.log("call accepted by " + easyrtc.idToName(easyrtcid));
 					videoCall.sendingVideoTo[id] = true;
-					videoCall.connectionCounter.increment();
 					videoCall.setLocalStream(easyrtc.getLocalStream());
 					if (conversationId) {
 						conversationList.get(conversationId).sendingVideo = true;

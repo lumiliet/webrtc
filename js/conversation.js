@@ -1,42 +1,11 @@
-var conversation = {};
-
-conversation.create = function(id, isGroupConversation) {
-	return {
-		messages: [],
-		id: id,
-		username: easyrtc.idToName(id),
-		active: false,
-		unseen: 0,
-		audio: false,
-		sendingVideo: false,
-		waitingForGroupVideo: null,
-		data: false,
-		visible: false,
-		online: true,
-		mostRecentTime: 0,
-		callCounter: {
-			video: 0,
-			file: 0,
-		},
-
-
-		cameraWindow: GUI.createCameraWindow(),	
-
-		isGroupConversation: (isGroupConversation == true),
-		participants: [],
-
-		participantIn: [],
+var conversation = {
+		reset();	
 
 		addMessage: function(senderId, message) {
 			this.messages.push({
 				senderId: senderId,
-				sender: (conversationList.get(senderId) ? conversationList.get(senderId).username : "Me"),
+				sender: (friendList.get(senderId) ? friendList.get(senderId).username : "Me"),
 				message: message,
-				time: function() {
-					var date = new Date();
-					conversationList.list[id].mostRecentTime = date.getTime();
-					return date.getTime();
-				}()
 			});
 		},
 
@@ -45,7 +14,7 @@ conversation.create = function(id, isGroupConversation) {
 				if (this.participants[i] === id) return;
 			}
 			this.participants.push(id);
-			conversationList.get(id).addParticipantIn(this.id);
+			friendList.get(id).addParticipantIn(this.id);
 		},
 
 		isParticipant: function(id) {
@@ -53,10 +22,6 @@ conversation.create = function(id, isGroupConversation) {
 				if (this.participants[i] === id) return true;
 			}
 			return false;
-		},
-
-		addParticipantIn: function(groupConversationId) {
-			this.participantIn.push(groupConversationId);
 		},
 
 		startVideoWaiting: function(groupConversationId) {
@@ -71,52 +36,61 @@ conversation.create = function(id, isGroupConversation) {
 			this.waitingForGroupVideo = null;
 		},
 
-		toString: function() {
-			var out = "";
-			if (this.unseen) {
-				out += "(" + this.unseen + ") ";
-			}
+	
 
-			if (this.isGroupConversation) {
-				if (this.participants.length) {
-					out += "Group: ";
-					for (var i = 0; i < this.participants.length; i++) {
-						out += conversationList.get(this.participants[i]).username;
-						if (i !== (this.participants.length -1)) out += ", ";
-					}
-				}
-				else out += "Group conversation";
-			}
-			else {
-				out += this.username;
-			}
-
-
-			return out;
-		},
-
-		toStringTitle: function() {
-			var out = "";
-			if (this.isGroupConversation) {
-				if (this.participants.length) {
-					out += "You are talking to ";
-					for (var i = 0; i < this.participants.length; i++) {
-						out += conversationList.get(this.participants[i]).username;
-						if (!conversationList.get(this.participants[i]).online) out += " (offline)";
-						if (i === (this.participants.length - 2)) out += " and ";
-						else if (i !== (this.participants.length -1)) out += ", ";
-					}
-				}
-				else {
-					out += "You are alone";
-				}
-			}
-			else {
-				if (!this.online) out += this.username + " is offline";
-				else out += "You are talking to " + this.username;
-			}
-			return out;
-		}
 
 	}
 }
+
+
+conversation.reset = function() {
+	console.log("It's happening");
+		this.messages: [],
+		this.id: id,
+		this.active: false,
+		this.unseen: 0,
+		this.waitingForGroupVideo: null,
+		this.visible: false,
+		this.idCounter: 0,
+		this.mostRecentTime: 0,
+		this.callCounter: {
+			audiovideo: 0,
+			file: 0,
+		},
+
+		this.participants: [],
+}
+
+
+conversation.newGroupConversation = function(conversationId) {
+	var id;
+	id = controller.id + "_" +  this.idCounter++;
+	this.newConversation(id, true);
+	return this.list[id];
+}
+
+conversation.groupConversationListener = function(id, participants) {
+	if (!this.get(id)) {
+		this.newGroupConversation(id);
+	}
+	this.get(id).participants.length = 0;
+	for (var p in participants) {
+		this.get(id).addParticipant(p);
+	}
+}
+
+conversation.addMessage = function(conversationId, senderId, message) {
+	this.list[conversationId].addMessage(senderId, message);
+
+	if (conversationId !== this.currentId) this.list[conversationId].unseen ++;
+
+	this.list[conversationId].visible = true;
+}
+
+conversation.closeConversation = function(conversationId) {
+	this.list[conversationId].messages.length = 0;
+	this.list[conversationId].unseen = 0;
+	this.list[conversationId].visible = false;
+	this.list[conversationId].mostRecentTime = 0;
+}
+
