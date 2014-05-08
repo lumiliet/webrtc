@@ -1,133 +1,54 @@
 var controller = {
-	friendSelectMode: false,
-	friendSelection: {},
 	id: "",
 }
 
-controller.setCurrentConversation = function(id) {
-	conversationList.setCurrent(id);
-	controller.updateGUI();
+controller.updateGUI = function() {
+	GUI.updateFriendList();
+	controller.updateChat();
 }
 
-controller.updateGUI = function() {
+controller.updateChat = function() {
 	GUI.cleanChat();
 
-	if (controller.friendSelectMode) {
-		GUI.setButtonText("newGroupConversationButton", " Done");
-	}
-	else {
-		GUI.setButtonText("newGroupConversationButton", "<span class=\"glyphicon glyphicon-plus\"></span> New group conversation");
-
-	}
-
-	if (conversationList.getCurrentId()) {
-		var messages = conversationList.getCurrent().messages;
+		var messages = conversation.messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 		
-	}
 	GUI.updateFriendList();
 
-	var text = "";
-	if (conversationList.getCurrent()) {	
-		text += conversationList.getCurrent().toStringTitle();
-	}
-	else {
-		text += "";
-	}
-
-
-	GUI.setChatLabel(text);	
 	GUI.focusize();
 }
 
 controller.sendMessage = function() {
 	var message = GUI.getTextFromMessageField();
 
-	if (!message.length || !conversationList.getCurrentId() || !conversationList.getCurrent().online) return;
+	if (!message.length || conversation.isFree()) return;
 
 	GUI.cleanMessageField();
-
-
-	if (conversationList.getCurrent().isGroupConversation) {
-		var participants = conversationList.getCurrent().participants
-			for (var i in participants) {
-				if (conversationList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversationList.getCurrentId(), message);
-			}
+	var participants = conversation.participants
+	for (var i in participants) {
+		if (friendList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversation.id, message);
 	}
-	else {
-		easyrtc.sendDataWS(conversationList.getCurrentId(), "message", message);
-	}
-	controller.addMessageToConversation(controller.id, message, conversationList.getCurrentId());
+	conversation.addMessage(controller.id, message);
 	controller.updateGUI();
 }
 
 controller.receiveMessage = function(id, msgType, message) {
 	if (msgType === "message") {	
-		controller.addMessageToConversation(id, message);
-		GUI.notification(conversationList.get(id).username);
+		conversation.addMessage(id, message);
+		GUI.notification(friendList.get(id).username);
 	}
 	else if (msgType === "roomInvite") {
-		if (!conversationList.get(message)) easyrtc.joinRoom(message);
-	}
-	else if (msgType === "waitForVideo") {
-		conversationList.get(id).startVideoWaiting(message);	
-	}
-	else if (msgType === "stopWaitingForVideo") {
-		conversationList.get(id).stopVideoWaiting();
-	}
-	else {
-		if (conversationList.get(msgType)) {
-			GUI.notification(conversationList.get(id).username);
-			controller.addMessageToConversation(id, message, msgType)
+		if (conversation.isFree()) {
+			easyrtc.joinRoom(message);
 		}
 	}
 	controller.updateGUI();
 }
-controller.addMessageToConversation = function(senderId, message, conversationId) {
-	conversationList.addMessage((conversationId ? conversationId : senderId), senderId, message);
-}
 
-controller.selectGroupMembersButtonListener = function() {
-	if (controller.friendSelectMode) {
-
-		if (Object.keys(controller.friendSelection).length !== 0) controller.createGroupConversation();
-		controller.setFriendSelectMode(false);
-	}
-
-	else {
-		controller.setFriendSelectMode(true);
-	}
-	controller.updateGUI();
-}
-
-controller.createGroupConversation = function() {
-	var groupConversation = conversationList.newGroupConversation();
-	easyrtc.joinRoom(groupConversation.id);	
-
-	controller.setCurrentConversation(groupConversation.id);
-	for (var friend in controller.friendSelection) {
-		controller.inviteFriendToRoom(friend, groupConversation.id);
-	}
-}
-
-controller.setFriendSelectMode = function(enable) {
-	controller.friendSelectMode = enable;
-	if (!enable) controller.friendSelection = {};
-	console.log("Friend select mode " + (enable? "activated" : "deactivated"));
-	controller.updateGUI();
-
-}
-
-controller.toggleFriendSelect = function(id) {
-	if (!controller.friendSelectMode) return;
-	if (controller.friendSelection[id]) delete controller.friendSelection[id];
-	else controller.friendSelection[id] = {};
-
-}
-
-controller.isFriendSelected = function(id) {
-	if (controller.friendSelection[id]) return true;
-	return false;
+controller.call = function(id) {
+	console.log("hohoho");
+	if (conversation.isFree()) easyrtc.joinRoom(conversation.newId());
+	controller.inviteFriendToRoom(id, conversation.id);
 }
 
 controller.inviteFriendToRoom = function(id, room) {
@@ -138,28 +59,13 @@ controller.roomListener = function(roomName, friends) {
 	if (!(roomName && friends)) return;
 	if (roomName === "default") {
 		GUI.updateFriendList(friends);
-		conversationList.updateOnlineFriends(friends);
+		friendList.updateOnlineFriends(friends);
 		controller.updateGUI();
 	}
 	else {
-		conversationList.groupConversationListener(roomName, friends);
+		conversation.groupConversationListener(roomName, friends);
 	}
-	conversationList.updateFriends(friends);
-	controller.updateGUI();
-}
-
-controller.documentKeyListener = function(e) {
-	if (e.keyCode === 27) {
-		controller.setFriendSelectMode(false);
-	}
-}
-
-controller.closeConversation = function(conversationId) {
-	if (fileTransfer.busy) return;
-	videoCall.disconnect(conversationId);
-	conversationList.closeConversation(conversationId);
-	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
-	if (conversationList.get(conversationId).isGroupConversation) easyrtc.leaveRoom(conversationId);
+	friendList.updateFriends(friends);
 	controller.updateGUI();
 }
 
@@ -167,6 +73,4 @@ controller.signalVideoWaiting= function(id, conversationId) {
 	if (conversationId) easyrtc.sendDataWS(id, "waitForVideo", conversationId);
 	else easyrtc.sendDataWS(id, "stopWaitingForVideo");
 }
-
-
 

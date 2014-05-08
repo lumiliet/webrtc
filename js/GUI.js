@@ -14,11 +14,6 @@ GUI.setup = function() {
 		}
 	}
 
-	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
-	newGroupConversationButton.onclick = function() {
-		controller.selectGroupMembersButtonListener();
-	};	
-
 	var dropZone = document.getElementById('chatArea');
 	dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
 	dropZone.addEventListener('drop', fileTransfer.handleDrop);
@@ -150,24 +145,18 @@ GUI.updateFriendList = function(friends) {
 		}
 		else {
 			glyphs.style.visibility = "hidden";
-			var startChatButton = document.createElement("span");
 			var startVideoButton = document.createElement("span");
-			var startAudioButton = document.createElement("span");
 
-			startChatButton.className = "glyph glyphicon glyphicon-comment";
 			startVideoButton.className = "glyph glyphicon glyphicon-facetime-video";
-			startAudioButton.className = "glyph glyphicon glyphicon-volume-up";
 
-			startChatButton.onclick = function(id) {
+			startVideoButton.onclick = function(id) {
 				return function() {
-					controller.setCurrentConversation(id);
+					controller.call(id);
 				}
 			}(id);
 
 
-			glyphs.appendChild(startChatButton);
-			//	glyphs.appendChild(startVideoButton);
-			//	glyphs.appendChild(startAudioButton);
+			glyphs.appendChild(startVideoButton);
 
 
 			friend.onmouseover = function(glyphs) {
@@ -204,41 +193,23 @@ GUI.generateMessageHTML = function(message) {
 	return messageLabel.outerHTML;
 }
 
-GUI.createCameraWindow = function() {
-	return {
-		open: false,
-		videoElements: 0,
+GUI.videoElements = 0;
 
-		createVideoElement: function(id) {
-			var video = this.window.document.createElement("video");
-			video.id = "video_" + id;
-			this.window.document.body.appendChild(video);
-			this.videoElements++;
-			return video;
-		},
-		deleteVideoElement: function(id) {
+GUI.createVideoElement = function(id) {
+	var videoArea = document.getElementById("videoArea");
+	var video = document.createElement("video");
+	video.id = "video_" + id;
+	videoArea.appendChild(video);
+	this.videoElements++;
+	return video;
+}
 
-			var video = this.window.document.getElementById("video_" + id);
-			if (!video) return;
-			this.window.document.body.removeChild(video);
-			this.videoElements--;
-		},
-
-		openWindow: function() {
-			this.window = window.open("cameraWindow.html","_blank","width=660,height=500");
-			this.open = true;
-		},
-		closeWindow: function() {
-			this.window.close();
-			this.open = false;
-		},
-		setTitle: function(title) {
-			this.window.document.title = title;
-		},
-
-
-		window: {}
-	};
+deleteVideoElement = function(id) {
+	var videoArea = document.getElementById("videoArea");
+	var video = document.getElementById("video_" + id);
+	if (!video) return;
+	videoArea.removeChild(video);
+	this.videoElements--;
 }
 
 GUI.updateProgressBar = function(value) {
@@ -255,8 +226,3 @@ GUI.updateProgressBar = function(value) {
 	}
 }
 
-GUI.showVideoGlyph = function(show) {
-	var videoGlyph = document.getElementById("startVideoGlyph");
-	if (show) videoGlyph.style.visibility = "visible";
-	else  videoGlyph.style.visibility = "hidden";
-}

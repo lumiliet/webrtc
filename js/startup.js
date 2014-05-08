@@ -1,10 +1,12 @@
 function start() {
+
+	conversation.reset();
 	
 	var username = location.search && location.search.split('?')[1];
 	
 	if (username) easyrtc.setUsername(username);
 	easyrtc.enableDebug(false);
-	easyrtc.enableVideo(false);
+	easyrtc.enableVideo(true);
 	easyrtc.enableVideoReceive(true);
 	easyrtc.enableAudio(false);
 	easyrtc.enableDataChannels(true);
@@ -31,6 +33,8 @@ function start() {
 	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
 
 	fileTransfer.setup();
+
+	videoCall.enableCamera();
 
 	GUI.setup();
 
