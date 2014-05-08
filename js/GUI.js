@@ -14,9 +14,6 @@ GUI.setup = function() {
 		}
 	}
 
-	var startVideoGlyph = document.getElementById("startVideoGlyph");
-	startVideoGlyph.onclick = videoCall.videoGlyphListener;
-
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {
 		controller.selectGroupMembersButtonListener();
@@ -38,10 +35,6 @@ GUI.setup = function() {
 		GUI.notification("", true);
 	};
 
-	var conversationList = document.getElementById("conversationList");
-	conversationList.onscroll = function() {
-		controller.updateGUI();
-	}
 	var friendList = document.getElementById("friendList");
 	friendList.onscroll = function() {
 		controller.updateGUI();
@@ -97,66 +90,6 @@ GUI.notification = function(name, reset) {
 GUI.setChatLabel = function(text) {
 	var chatLabel = document.getElementById("midLabel");
 	chatLabel.innerHTML = text;
-}
-
-GUI.updateConversationList = function(list) {
-	var conversationList = document.getElementById("conversationList");
-
-	while (conversationList.hasChildNodes()) {
-		conversationList.removeChild(conversationList.lastChild);
-	}
-
-	for (var id in list) {
-		if (!list[id].visible) continue;
-		var conversation = document.createElement("div");
-		conversation.className = "conversation " + (list[id].active ? "conversationActive" : "conversationPassive");
-		conversation.id = "conversation_" + list[id].id;
-
-		var conversationText = document.createElement("span");
-		conversationText.className = "conversationText";
-		conversationText.innerHTML += list[id].toString();
-		conversation.appendChild(conversationText);
-		conversationText.onclick = function(id) {
-			return function() {
-				controller.setCurrentConversation(id);
-			}
-		}(list[id].id);
-
-
-		var glyphContainer = document.createElement("span");
-		glyphContainer.className = "closeConversationGlyph";
-
-		var closeGlyph = document.createElement("span");
-		closeGlyph.className = "glyph glyphicon glyphicon-remove";
-
-		conversation.onmouseover = function(closeGlyph) {
-			return function() {
-				closeGlyph.style.visibility = "visible";
-			}
-		}(closeGlyph);
-
-		conversation.onmouseout = function(closeGlyph) {
-			return function() {
-				closeGlyph.style.visibility = "hidden";
-			}
-		}(closeGlyph);
-
-		closeGlyph.onclick = function(id) {
-			return function() {
-				controller.closeConversation(id);
-			}
-		}(list[id].id);
-
-
-
-		glyphContainer.appendChild(closeGlyph);
-
-		conversation.appendChild(glyphContainer);
-
-		conversationList.appendChild(conversation);
-	}
-
-
 }
 
 GUI.updateFriendList = function(friends) {

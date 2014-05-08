@@ -24,13 +24,7 @@ controller.updateGUI = function() {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 		
-		if (conversationList.getCurrent().isGroupConversation && conversationList.getCurrent().participants.length === 0) GUI.showVideoGlyph(false);
-		else GUI.showVideoGlyph(true);
 	}
-	else {
-		GUI.showVideoGlyph(false);
-	}
-	GUI.updateConversationList(conversationList.getAll());
 	GUI.updateFriendList();
 
 	var text = "";
