@@ -4,11 +4,11 @@ var conversationList = {
 	currentId: ""
 }
 
-conversationList.newConversation = function(id, multi) {	
+conversationList.newConversation = function(id, isGroupConversation) {	
 	if (this.list[id]) return;
 	if (typeof(id) !== "string") return;
 	
-	this.list[id] = conversation.create(id, multi);
+	this.list[id] = conversation.create(id, isGroupConversation);
 }
 
 conversationList.newGroupConversation = function(conversationId) {
@@ -84,7 +84,7 @@ conversationList.updateFriends = function(friends) {
 
 conversationList.updateOnlineFriends = function(friends) {
 	for (var id in this.list) {
-		if (!this.list[id].multi) this.list[id].online = false;
+		if (!this.list[id].isGroupConversation) this.list[id].online = false;
 	}
 	for (var id in friends) {
 		if (this.list[id]) this.list[id].online = true;

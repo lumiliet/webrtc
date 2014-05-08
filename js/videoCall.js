@@ -119,7 +119,7 @@ videoCall.enableSource = function(enable) {
 
 videoCall.connect = function() {
 	var conversation = conversationList.getCurrent();
-	if (conversation.multi) {
+	if (conversation.isGroupConversation) {
 		var participants = conversation.participants;
 
 		for (var p in participants) {
@@ -134,7 +134,7 @@ videoCall.connect = function() {
 videoCall.disconnect = function(conversationId) {
 	var conversation = (conversationId ? conversationList.get(conversationId) : conversationList.getCurrent());
 	if (!conversation) return;
-	if (conversation.multi) {
+	if (conversation.isGroupConversation) {
 		var participants = conversation.participants;
 
 		for (var p in participants) {

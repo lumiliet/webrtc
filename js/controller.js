@@ -24,7 +24,7 @@ controller.updateGUI = function() {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 		
-		if (conversationList.getCurrent().multi && conversationList.getCurrent().participants.length === 0) GUI.showVideoGlyph(false);
+		if (conversationList.getCurrent().isGroupConversation && conversationList.getCurrent().participants.length === 0) GUI.showVideoGlyph(false);
 		else GUI.showVideoGlyph(true);
 	}
 	else {
@@ -54,7 +54,7 @@ controller.sendMessage = function() {
 	GUI.cleanMessageField();
 
 
-	if (conversationList.getCurrent().multi) {
+	if (conversationList.getCurrent().isGroupConversation) {
 		var participants = conversationList.getCurrent().participants
 			for (var i in participants) {
 				if (conversationList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversationList.getCurrentId(), message);
@@ -141,6 +141,7 @@ controller.inviteFriendToRoom = function(id, room) {
 }
 
 controller.roomListener = function(roomName, friends) {
+	if (!(roomName && friends)) return;
 	if (roomName === "default") {
 		GUI.updateFriendList(friends);
 		conversationList.updateOnlineFriends(friends);
@@ -164,7 +165,7 @@ controller.closeConversation = function(conversationId) {
 	videoCall.disconnect(conversationId);
 	conversationList.closeConversation(conversationId);
 	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
-	if (conversationList.get(conversationId).multi) easyrtc.leaveRoom(conversationId);
+	if (conversationList.get(conversationId).isGroupConversation) easyrtc.leaveRoom(conversationId);
 	controller.updateGUI();
 }
 

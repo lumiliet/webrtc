@@ -2,6 +2,10 @@ var fileTransfer = {
 	busy: false
 };
 
+fileTransfer.setup= function() {
+	easyrtc_ft.buildFileReceiver(fileTransfer.accept, fileTransfer.saveFile, fileTransfer.receiverStatus);
+}
+
 fileTransfer.dataChannelOpenListener = function(id){
 	console.log("Data channel established " + id);
 	conversationList.get(id).data = true;
@@ -18,9 +22,6 @@ fileTransfer.dataChannelCloseListener = function(id) {
 	controller.updateGUI();
 }
 
-fileTransfer.startup = function() {
-	easyrtc_ft.buildFileReceiver(fileTransfer.accept, fileTransfer.saveFile, fileTransfer.receiverStatus);
-}
 
 fileTransfer.accept = function(id, fileNameList, wasAccepted) {
 	if (fileTransfer.busy) wasAccepted(false);
@@ -80,7 +81,7 @@ fileTransfer.connect = function() {
 	if (!conversation) return;
 	fileTransfer.conversation = conversation;
 
-	if (conversation.multi) {
+	if (conversation.isGroupConversation) {
 		var participants = conversation.participants;
 
 		for (var p in participants) {
@@ -155,7 +156,7 @@ fileTransfer.sendFiles = function() {
 	var conversation = fileTransfer.conversation;
 
 	var fileSender;
-	if (conversation.multi) {
+	if (conversation.isGroupConversation) {
 		var participants = conversation.participants;
 		for (var i in participants) {
 			if (conversationList.get(participants[i]).data) {

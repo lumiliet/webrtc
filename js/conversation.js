@@ -1,6 +1,6 @@
 var conversation = {};
 
-conversation.create = function(id, multi) {
+conversation.create = function(id, isGroupConversation) {
 	return {
 		messages: [],
 		id: id,
@@ -22,7 +22,7 @@ conversation.create = function(id, multi) {
 
 		cameraWindow: GUI.createCameraWindow(),	
 
-		multi: (multi == true),
+		isGroupConversation: (isGroupConversation == true),
 		participants: [],
 
 		participantIn: [],
@@ -77,7 +77,7 @@ conversation.create = function(id, multi) {
 				out += "(" + this.unseen + ") ";
 			}
 
-			if (this.multi) {
+			if (this.isGroupConversation) {
 				if (this.participants.length) {
 					out += "Group: ";
 					for (var i = 0; i < this.participants.length; i++) {
@@ -97,7 +97,7 @@ conversation.create = function(id, multi) {
 
 		toStringTitle: function() {
 			var out = "";
-			if (this.multi) {
+			if (this.isGroupConversation) {
 				if (this.participants.length) {
 					out += "You are talking to ";
 					for (var i = 0; i < this.participants.length; i++) {

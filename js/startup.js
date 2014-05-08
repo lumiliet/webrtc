@@ -30,7 +30,7 @@ function start() {
 	easyrtc.setStreamAcceptor(videoCall.acceptor);
 	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
 
-	fileTransfer.startup();
+	fileTransfer.setup();
 
 	GUI.setup();
 
