@@ -41,7 +41,6 @@ html, body {
 	overflow-y: auto;
 	overflow-x: hidden;
 	word-wrap: break-word;
-
 }
 	
 #newGroupConversationButton, #sendMessageField, #glyphs {

@@ -20,8 +20,6 @@ conversation.create = function(id, isGroupConversation) {
 		},
 
 
-		cameraWindow: GUI.createCameraWindow(),	
-
 		isGroupConversation: (isGroupConversation == true),
 		participants: [],
 
@@ -57,18 +55,6 @@ conversation.create = function(id, isGroupConversation) {
 
 		addParticipantIn: function(groupConversationId) {
 			this.participantIn.push(groupConversationId);
-		},
-
-		startVideoWaiting: function(groupConversationId) {
-			console.log("Wating for group video");
-			this.waitingForGroupVideo = {
-				id: groupConversationId
-			};
-		},
-
-		stopVideoWaiting: function() {
-			console.log("Stopped waiting for group video");
-			this.waitingForGroupVideo = null;
 		},
 
 		toString: function() {

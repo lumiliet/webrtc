@@ -27,9 +27,6 @@ function start() {
 	easyrtc.setDataChannelOpenListener(fileTransfer.dataChannelOpenListener);
 	easyrtc.setDataChannelCloseListener(fileTransfer.dataChannelCloseListener);
 	
-	easyrtc.setStreamAcceptor(videoCall.acceptor);
-	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
-
 	fileTransfer.setup();
 
 	GUI.setup();

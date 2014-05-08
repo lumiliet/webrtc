@@ -24,11 +24,6 @@ controller.updateGUI = function() {
 		var messages = conversationList.getCurrent().messages;
 		for (var x in messages) GUI.writeMessageToChat(messages[x]);
 		
-		if (conversationList.getCurrent().isGroupConversation && conversationList.getCurrent().participants.length === 0) GUI.showVideoGlyph(false);
-		else GUI.showVideoGlyph(true);
-	}
-	else {
-		GUI.showVideoGlyph(false);
 	}
 	GUI.updateConversationList(conversationList.getAll());
 	GUI.updateFriendList();
@@ -74,12 +69,6 @@ controller.receiveMessage = function(id, msgType, message) {
 	}
 	else if (msgType === "roomInvite") {
 		if (!conversationList.get(message)) easyrtc.joinRoom(message);
-	}
-	else if (msgType === "waitForVideo") {
-		conversationList.get(id).startVideoWaiting(message);	
-	}
-	else if (msgType === "stopWaitingForVideo") {
-		conversationList.get(id).stopVideoWaiting();
 	}
 	else {
 		if (conversationList.get(msgType)) {
@@ -161,18 +150,12 @@ controller.documentKeyListener = function(e) {
 }
 
 controller.closeConversation = function(conversationId) {
-	if (fileTransfer.busy) return;
-	videoCall.disconnect(conversationId);
 	conversationList.closeConversation(conversationId);
 	if (conversationList.getCurrentId() === conversationId) conversationList.setCurrent("");
 	if (conversationList.get(conversationId).isGroupConversation) easyrtc.leaveRoom(conversationId);
 	controller.updateGUI();
 }
 
-controller.signalVideoWaiting= function(id, conversationId) {
-	if (conversationId) easyrtc.sendDataWS(id, "waitForVideo", conversationId);
-	else easyrtc.sendDataWS(id, "stopWaitingForVideo");
-}
 
 
 

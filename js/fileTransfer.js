@@ -74,7 +74,7 @@ fileTransfer.handleDrop = function(evt) {
 
 
 fileTransfer.connect = function() {
-	if (fileTransfer.busy || videoCall.busy) return;
+	if (fileTransfer.busy) return;
 	fileTransfer.busy = true;
 
 	var conversation = conversationList.getCurrent();
@@ -142,7 +142,7 @@ fileTransfer.countCalls = function(conversationId, increment) {
 	if (conversation.callCounter.file === 0) {
 		if (fileTransfer.files) {
 			fileTransfer.sendFiles();
-			fileTransfer.finished();
+			fileTransfer.disconnect();
 		}
 	}
 	else {
@@ -193,10 +193,27 @@ fileTransfer.senderStatus = function(msg) {
 }
 
 
-fileTransfer.finished= function() {
+fileTransfer.disconnect = function() {
+	var conversation = fileTransfer.conversation;
+	if (!conversation) return;
+
+
+	if (conversation.multi) {
+		var participants = conversation.participants;
+
+		for (var p in participants) {
+			easyrtc.hangup(participants[p]);
+		}
+	}
+	else {
+		easyrtc.hangup(conversation.id);
+	}
+	controller.updateGUI();
 
 	delete fileTransfer.files;
 	delete fileTransfer.conversation;
 
+	fileTransfer.busy = false;
 }
+
 

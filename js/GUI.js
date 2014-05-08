@@ -14,9 +14,6 @@ GUI.setup = function() {
 		}
 	}
 
-	var startVideoGlyph = document.getElementById("startVideoGlyph");
-	startVideoGlyph.onclick = videoCall.videoGlyphListener;
-
 	var newGroupConversationButton = document.getElementById("newGroupConversationButton");
 	newGroupConversationButton.onclick = function() {
 		controller.selectGroupMembersButtonListener();
@@ -218,12 +215,8 @@ GUI.updateFriendList = function(friends) {
 		else {
 			glyphs.style.visibility = "hidden";
 			var startChatButton = document.createElement("span");
-			var startVideoButton = document.createElement("span");
-			var startAudioButton = document.createElement("span");
 
 			startChatButton.className = "glyph glyphicon glyphicon-comment";
-			startVideoButton.className = "glyph glyphicon glyphicon-facetime-video";
-			startAudioButton.className = "glyph glyphicon glyphicon-volume-up";
 
 			startChatButton.onclick = function(id) {
 				return function() {
@@ -233,9 +226,6 @@ GUI.updateFriendList = function(friends) {
 
 
 			glyphs.appendChild(startChatButton);
-			//	glyphs.appendChild(startVideoButton);
-			//	glyphs.appendChild(startAudioButton);
-
 
 			friend.onmouseover = function(glyphs) {
 				return function() {
@@ -271,43 +261,6 @@ GUI.generateMessageHTML = function(message) {
 	return messageLabel.outerHTML;
 }
 
-GUI.createCameraWindow = function() {
-	return {
-		open: false,
-		videoElements: 0,
-
-		createVideoElement: function(id) {
-			var video = this.window.document.createElement("video");
-			video.id = "video_" + id;
-			this.window.document.body.appendChild(video);
-			this.videoElements++;
-			return video;
-		},
-		deleteVideoElement: function(id) {
-
-			var video = this.window.document.getElementById("video_" + id);
-			if (!video) return;
-			this.window.document.body.removeChild(video);
-			this.videoElements--;
-		},
-
-		openWindow: function() {
-			this.window = window.open("cameraWindow.html","_blank","width=660,height=500");
-			this.open = true;
-		},
-		closeWindow: function() {
-			this.window.close();
-			this.open = false;
-		},
-		setTitle: function(title) {
-			this.window.document.title = title;
-		},
-
-
-		window: {}
-	};
-}
-
 GUI.updateProgressBar = function(value) {
 	var progressBarContainer = document.getElementById("progressBarContainer");
 	if (!value) {
@@ -320,10 +273,4 @@ GUI.updateProgressBar = function(value) {
 		var progressBar = document.getElementById("progressBar");
 		progressBar.style.width = value + "%";
 	}
-}
-
-GUI.showVideoGlyph = function(show) {
-	var videoGlyph = document.getElementById("startVideoGlyph");
-	if (show) videoGlyph.style.visibility = "visible";
-	else  videoGlyph.style.visibility = "hidden";
 }
