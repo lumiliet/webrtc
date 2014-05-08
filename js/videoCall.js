@@ -58,12 +58,11 @@ videoCall.enableSource = function(enable) {
 }
 
 videoCall.connect = function() {
-	console.log("HALLA");
-		var participants = conversation.participants;
+	var participants = conversation.participants;
 
-		for (var p in participants) {
-			videoCall.call(participants[p], conversation.id);
-		}
+	for (var p in participants) {
+		videoCall.call(participants[p], conversation.id);
+	}
 }
 
 videoCall.enableCamera = function() {
@@ -71,13 +70,13 @@ videoCall.enableCamera = function() {
 		function(){
 			videoCall.setLocalStream(easyrtc.getLocalStream());
 			easyrtc.setVideoObjectSrc(GUI.createVideoElement(controller.id), videoCall.localStream.stream);
+			controller.busy = false;
 
 		},
 		function(){
 			easyrtc.showError("no-media", "Unable to get local media");
 		}
 	);
-
 }
 
 videoCall.disconnect = function(conversationId) {

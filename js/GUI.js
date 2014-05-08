@@ -193,6 +193,7 @@ GUI.createVideoElement = function(id) {
 	video.className = "videoElement";
 	videoArea.appendChild(video);
 	this.videoElements++;
+	GUI.updateVideoElements();
 	return video;
 }
 
@@ -202,6 +203,7 @@ GUI.deleteVideoElement = function(id) {
 	if (!video) return;
 	videoArea.removeChild(video);
 	this.videoElements--;
+	GUI.updateVideoElements();
 }
 
 GUI.updateProgressBar = function(value) {
@@ -215,6 +217,32 @@ GUI.updateProgressBar = function(value) {
 		document.getElementById("mainContainer").className = "row smaller";
 		var progressBar = document.getElementById("progressBar");
 		progressBar.style.width = value + "%";
+	}
+}
+
+GUI.updateVideoElements = function() {
+	
+	var width = 100;
+	var height = 100;
+
+	var elements = GUI.videoElements;
+
+	if (elements <= 0);
+	else if (elements <= 3) width /= elements;
+	else if (elements === 4) {
+		width /= 2;
+		height /= 2;
+	}
+	else {
+		width /= 3;
+		height /= (Math.floor((elements - 1)/3) + 1);
+		console.log(height);
+	}
+	var videoElements = document.getElementsByClassName("videoElement");
+
+	for (var i = 0; i < videoElements.length; i++) {
+		videoElements[i].style.width = width + "%";
+		videoElements[i].style.height = height + "%";
 	}
 }
 

@@ -31,7 +31,7 @@ html, body {
 }
 
 
-#friendList, #conversationList, #chatArea {
+#friendList  {
 	position: absolute;
 	top: 50px;
 	left: 0px;
@@ -43,6 +43,7 @@ html, body {
 	word-wrap: break-word;
 
 }
+
 	
 #newGroupConversationButton, #sendMessageField, #glyphs {
 	position: absolute;
@@ -55,9 +56,11 @@ html, body {
 }
 
 .videoElement {
-	width: 300px;
-
+	width: 100%;
+	height: 100%;
 }
+
+
 .chatMessage {
 	padding: 10px 20px 0px 20px;
 }

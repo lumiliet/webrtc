@@ -41,36 +41,23 @@ conversation.isFree = function() {
 }
 
 conversation.reset = function() {
-	console.log("It's happening");
 	this.messages = [];
-	this.active = false;
-	this.unseen = 0;
-	this.waitingForGroupVideo = null;
+	this.id = "";
 	this.visible = false;
 	this.idCounter = 0;
-	this.mostRecentTime = 0;
-	this.callCounter = {
-		audiovideo: 0,
-		file: 0,
-	};
-
 	this.participants = [];
 }
 
-conversation.newId = function() {
-	this.id = controller.id + "_" + this.idCounter++;
-	return this.id;
+conversation.generateId = function() {
+	return controller.id + "_" + this.idCounter++;
 }
 
-
 conversation.groupConversationListener = function(id, participants) {
-	console.log(id);
-	console.log(participants);
-	if (Object.keys(participants).length === 0) {
-	//	this.reset();
-	//	console.log("Leaving room: " + id);	
-		//easyrtc.leaveRoom(id);
-	//	return;
+	if (Object.keys(participants).length === 0 && id === this.id) {
+		this.reset();
+		console.log("Leaving room: " + id);	
+		easyrtc.leaveRoom(id);
+		return;
 	}
 
 	for (var p in participants) this.addParticipant(p);

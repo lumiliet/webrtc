@@ -1,18 +1,20 @@
 var controller = {
 	id: "",
+	busy: true,
 }
 
 controller.updateGUI = function() {
 	GUI.updateFriendList();
 	//controller.updateChat();
+	GUI.updateVideoElements();
 }
 
 controller.updateChat = function() {
 	GUI.cleanChat();
 
-		var messages = conversation.messages;
-		for (var x in messages) GUI.writeMessageToChat(messages[x]);
-		
+	var messages = conversation.messages;
+	for (var x in messages) GUI.writeMessageToChat(messages[x]);
+	
 	GUI.updateFriendList();
 
 	GUI.focusize();
@@ -33,6 +35,7 @@ controller.sendMessage = function() {
 }
 
 controller.receiveMessage = function(id, msgType, message) {
+	if (controller.busy) return;
 	if (msgType === "message") {	
 		conversation.addMessage(id, message);
 		GUI.notification(friendList.get(id).username);
@@ -40,16 +43,18 @@ controller.receiveMessage = function(id, msgType, message) {
 	else if (msgType === "roomInvite") {
 		if (conversation.isFree()) {
 			easyrtc.joinRoom(message);
+			controller.inviteFriendToRoom(id, message);
 		}
 	}
 	controller.updateGUI();
 }
 
 controller.call = function(id) {
-	if (conversation.isFree()) {
-		easyrtc.joinRoom(conversation.newId());
+	var conversationId = conversation.id;
+	if (!conversationId) {
+		conversationId = conversation.generateId();
 	}
-	controller.inviteFriendToRoom(id, conversation.id);
+	controller.inviteFriendToRoom(id, conversationId);
 }
 
 controller.inviteFriendToRoom = function(id, room) {
