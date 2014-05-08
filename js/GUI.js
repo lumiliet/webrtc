@@ -6,15 +6,7 @@ var GUI = {
 };
 
 GUI.setup = function() {
-
-	var messageField = document.getElementById("sendMessageField");
-	messageField.onkeyup = function(e) {
-		if (e.keyCode === 13) {
-			controller.sendMessage();
-		}
-	}
-
-	var dropZone = document.getElementById('chatArea');
+	var dropZone = document.getElementById('videoArea');
 	dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
 	dropZone.addEventListener('drop', fileTransfer.handleDrop);
 
@@ -34,7 +26,6 @@ GUI.setup = function() {
 	friendList.onscroll = function() {
 		controller.updateGUI();
 	}
-
 }
 
 GUI.focusize = function() {
@@ -199,12 +190,13 @@ GUI.createVideoElement = function(id) {
 	var videoArea = document.getElementById("videoArea");
 	var video = document.createElement("video");
 	video.id = "video_" + id;
+	video.className = "videoElement";
 	videoArea.appendChild(video);
 	this.videoElements++;
 	return video;
 }
 
-deleteVideoElement = function(id) {
+GUI.deleteVideoElement = function(id) {
 	var videoArea = document.getElementById("videoArea");
 	var video = document.getElementById("video_" + id);
 	if (!video) return;

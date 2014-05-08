@@ -1,4 +1,5 @@
-var conversation = {}
+var conversation = {
+}
 
 conversation.addMessage = function(senderId, message) {
 	this.messages.push({
@@ -13,7 +14,6 @@ conversation.addParticipant = function(id) {
 		if (this.participants[i] === id) return;
 	}
 	this.participants.push(id);
-	friendList.get(id).addParticipantIn(this.id);
 }
 
 conversation.isParticipant = function(id) {
@@ -36,7 +36,7 @@ conversation.stopVideoWaiting = function() {
 }
 
 conversation.isFree = function() {
-	if (this.participants.length === 0) return true;
+	if (Object.keys(easyrtc.getRoomsJoined()).length === 1) return true;
 	return false;
 }
 
@@ -64,13 +64,20 @@ conversation.newId = function() {
 
 
 conversation.groupConversationListener = function(id, participants) {
-	if (this.id === id) {
-		console.log("I called");
-	}
-	else if (this.isFree()) {
-		videoCall.connect();
-	}
+	console.log(id);
 	console.log(participants);
+	if (Object.keys(participants).length === 0) {
+	//	this.reset();
+	//	console.log("Leaving room: " + id);	
+		//easyrtc.leaveRoom(id);
+	//	return;
+	}
+
+	for (var p in participants) this.addParticipant(p);
+	if (this.id !== id) {
+		videoCall.connect();
+		this.id = id;
+	}
 }
 
 

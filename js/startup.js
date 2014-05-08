@@ -9,7 +9,7 @@ function start() {
 	easyrtc.enableVideo(true);
 	easyrtc.enableVideoReceive(true);
 	easyrtc.enableAudio(false);
-	easyrtc.enableDataChannels(true);
+	easyrtc.enableDataChannels(false);
 	easyrtc.setPeerListener(controller.receiveMessage);
 	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
@@ -32,7 +32,6 @@ function start() {
 	easyrtc.setStreamAcceptor(videoCall.acceptor);
 	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
 
-	fileTransfer.setup();
 
 	videoCall.enableCamera();
 

@@ -4,7 +4,7 @@ var controller = {
 
 controller.updateGUI = function() {
 	GUI.updateFriendList();
-	controller.updateChat();
+	//controller.updateChat();
 }
 
 controller.updateChat = function() {
@@ -46,8 +46,9 @@ controller.receiveMessage = function(id, msgType, message) {
 }
 
 controller.call = function(id) {
-	console.log("hohoho");
-	if (conversation.isFree()) easyrtc.joinRoom(conversation.newId());
+	if (conversation.isFree()) {
+		easyrtc.joinRoom(conversation.newId());
+	}
 	controller.inviteFriendToRoom(id, conversation.id);
 }
 

@@ -54,14 +54,10 @@ html, body {
 	margin: auto;
 }
 
-#startVideoGlyph {
-	right: 0px;
-	left: 0px;
-	position: absolute;
-	margin: auto;
-	visibility: hidden;
-}
+.videoElement {
+	width: 300px;
 
+}
 .chatMessage {
 	padding: 10px 20px 0px 20px;
 }

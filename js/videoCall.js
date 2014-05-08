@@ -13,19 +13,21 @@ videoCall.acceptor = function(id, stream) {
 	console.log("Call from " + friendList.get(id).username);
 
 	friendList.get(id).video = true;
-
+	easyrtc.setVideoObjectSrc(GUI.createVideoElement(id), stream);
 
 
 }
 
 videoCall.disconnectListener = function(id) {
-	console.log(conversationList.get(id).username + " disconnected from video chat");
+	console.log(friendList.get(id).username + " disconnected from video chat");
 
 	friendList.get(id).video = false;
 
 	if (videoCall.sendingVideoTo[id]) {
 		delete videoCall.sendingVideoTo[id];
 	}
+
+	GUI.deleteVideoElement(id);
 
 }
 
@@ -41,7 +43,6 @@ videoCall.stopLocalStream = function() {
 }
 
 videoCall.sendVideo = function() {
-	if (!conversationList.getCurrent()) return;
 	if (fileTransfer.busy || videoCall.busy) return;
 	videoCall.busy = true;
 
@@ -57,6 +58,7 @@ videoCall.enableSource = function(enable) {
 }
 
 videoCall.connect = function() {
+	console.log("HALLA");
 		var participants = conversation.participants;
 
 		for (var p in participants) {
@@ -68,6 +70,7 @@ videoCall.enableCamera = function() {
 	easyrtc.initMediaSource(
 		function(){
 			videoCall.setLocalStream(easyrtc.getLocalStream());
+			easyrtc.setVideoObjectSrc(GUI.createVideoElement(controller.id), videoCall.localStream.stream);
 
 		},
 		function(){
@@ -84,22 +87,15 @@ videoCall.disconnect = function(conversationId) {
 
 
 videoCall.call = function(id, conversationId) {
-	console.log("Call to "  + conversationList.get(id));
-	if (!conversationList.get(id).online) {
+	console.log("Call to "  + friendList.get(id).username);
+	if (!friendList.get(id).online) {
 		console.log("Call failed, friend no longer online");
 		return;
 	}
-	if (conversationList.get(id).sendingVideo) {
+	if (friendList.get(id).sendingVideo) {
 		console.log("Video call to " + id + " already established");
 		return;
 	}
-
-	if (conversationId) {
-		controller.signalVideoWaiting(id, conversationId);
-		videoCall.countCalls(conversationId, true);
-	}
-	else videoCall.countCalls(id, true);
-
 	easyrtc.call(id,
 			function(otherCaller, mediaType) {
 				console.log("Call succesful - " + otherCaller + " - " + mediaType);
@@ -112,11 +108,7 @@ videoCall.call = function(id, conversationId) {
 					if(wasAccepted){
 						console.log("call accepted by " + easyrtc.idToName(easyrtcid));
 						videoCall.sendingVideoTo[id] = true;
-						videoCall.setLocalStream(easyrtc.getLocalStream());
-						if (conversationId) {
-							conversationList.get(conversationId).sendingVideo = true;
-						}
-						conversationList.get(easyrtcid).sendingVideo = true;
+						friendList.get(easyrtcid).sendingVideo = true;
 					}
 					else{
 						console.log("call rejected" + easyrtc.idToName(easyrtcid));
