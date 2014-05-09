@@ -2,7 +2,8 @@ var GUI = {
 	videoVisible: false,
 	documentTitle: "Webrtc Chat",
 	focus: true,
-	friends: []
+	friends: [],
+	chat: false,
 };
 
 GUI.setup = function() {
@@ -26,6 +27,29 @@ GUI.setup = function() {
 	friendList.onscroll = function() {
 		controller.updateGUI();
 	}
+
+	var exitButton = document.getElementById("exitButton");
+	exitButton.onclick= function() {
+		videoCall.disconnect();
+	}
+	var messageField = document.getElementById("sendMessageField");
+	messageField.onkeyup = function(e) {
+		if (e.keyCode === 13) {
+			controller.sendMessage();
+		}
+	}
+
+	var chatEdge = document.getElementById("chatEdge");
+	chatEdge.onclick = function() {
+		console.log("hoho");
+		GUI.showChat(!GUI.chat);
+		GUI.chat = !GUI.chat;	
+	}; 
+
+	var dropZone = document.getElementById('chatArea');
+	dropZone.addEventListener('dragover', fileTransfer.handleDragOver);
+	dropZone.addEventListener('drop', fileTransfer.handleDrop);
+
 }
 
 GUI.focusize = function() {
@@ -36,6 +60,12 @@ GUI.focusize = function() {
 GUI.setButtonDisabled = function(id, disabled) {
 	var button = document.getElementById(id);
 	button.disabled = disabled;
+}
+
+GUI.setExitButtonVisible = function(visible) {
+	var button = document.getElementById("exitButton");
+	if (visible) button.style.display = "block";
+	else button.style.display = "none";
 }
 
 GUI.setButtonText = function(id, text) {
@@ -188,10 +218,17 @@ GUI.videoElements = 0;
 
 GUI.createVideoElement = function(id) {
 	var videoArea = document.getElementById("videoArea");
+	var videoContainer = document.createElement("div");
 	var video = document.createElement("video");
-	video.id = "video_" + id;
+	var videoTitle = document.createElement("div");
+	videoTitle.innerHTML = (friendList.get(id) ? friendList.get(id).username : "Me");
+	videoTitle.className = "videoTitle";
+	videoContainer.id = "video_" + id;
+	videoContainer.className = "videoContainer";
 	video.className = "videoElement";
-	videoArea.appendChild(video);
+	videoContainer.appendChild(videoTitle);
+	videoContainer.appendChild(video);
+	videoArea.appendChild(videoContainer);
 	this.videoElements++;
 	GUI.updateVideoElements();
 	return video;
@@ -228,21 +265,34 @@ GUI.updateVideoElements = function() {
 	var elements = GUI.videoElements;
 
 	if (elements <= 0);
-	else if (elements <= 3) width /= elements;
-	else if (elements === 4) {
-		width /= 2;
-		height /= 2;
-	}
+	else if (elements <= 2) width /= elements;
 	else {
-		width /= 3;
-		height /= (Math.floor((elements - 1)/3) + 1);
-		console.log(height);
+		width /= 2;
+		height /= (Math.floor((elements - 1)/2) + 1);
 	}
-	var videoElements = document.getElementsByClassName("videoElement");
+	var videoContainers = document.getElementsByClassName("videoContainer");
 
-	for (var i = 0; i < videoElements.length; i++) {
-		videoElements[i].style.width = width + "%";
-		videoElements[i].style.height = height + "%";
+	for (var i = 0; i < videoContainers.length; i++) {
+		videoContainers[i].style.width = width + "%";
+		videoContainers[i].style.height = height + "%";
+
 	}
 }
 
+GUI.showChat = function(show) {
+	var leftCol = document.getElementById("leftCol");
+	var midCol = document.getElementById("midCol");
+	var chatContainer = document.getElementById("chatContainer");
+	if (show) {
+		leftCol.className = "col-xs-3 fill";
+		midCol.className = "col-xs-6 fill";
+		chatContainer.className = "";
+	}
+	else {
+		leftCol.className = "small col-xs-3 fill";
+		midCol.className = "col-xs-9 fill";
+		chatContainer.className = "hidden";
+	
+	}
+	controller.updateChat();
+}

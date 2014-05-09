@@ -1,4 +1,5 @@
 var conversation = {
+	idCounter: 0
 }
 
 conversation.addMessage = function(senderId, message) {
@@ -36,7 +37,7 @@ conversation.stopVideoWaiting = function() {
 }
 
 conversation.isFree = function() {
-	if (Object.keys(easyrtc.getRoomsJoined()).length === 1) return true;
+	if (conversation.id === "") return true;
 	return false;
 }
 
@@ -44,7 +45,6 @@ conversation.reset = function() {
 	this.messages = [];
 	this.id = "";
 	this.visible = false;
-	this.idCounter = 0;
 	this.participants = [];
 }
 

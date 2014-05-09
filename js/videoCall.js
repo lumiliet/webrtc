@@ -80,7 +80,16 @@ videoCall.enableCamera = function() {
 }
 
 videoCall.disconnect = function(conversationId) {
-	
+	console.log(conversation.participants);
+	if (!conversation.isFree()) {
+		var participants = conversation.participants;
+		for (var p in participants) {
+			console.log( participants[p]);
+			friendList.get( participants[p]).audiovideo = false;
+			easyrtc.hangup( participants[p]);
+		}
+		controller.reset();
+	}
 }
 
 
@@ -91,7 +100,7 @@ videoCall.call = function(id, conversationId) {
 		console.log("Call failed, friend no longer online");
 		return;
 	}
-	if (friendList.get(id).sendingVideo) {
+	if (friendList.get(id).audiovideo) {
 		console.log("Video call to " + id + " already established");
 		return;
 	}
@@ -107,7 +116,7 @@ videoCall.call = function(id, conversationId) {
 					if(wasAccepted){
 						console.log("call accepted by " + easyrtc.idToName(easyrtcid));
 						videoCall.sendingVideoTo[id] = true;
-						friendList.get(easyrtcid).sendingVideo = true;
+						friendList.get(easyrtcid).audiovideo = true;
 					}
 					else{
 						console.log("call rejected" + easyrtc.idToName(easyrtcid));

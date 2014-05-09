@@ -5,8 +5,12 @@ var controller = {
 
 controller.updateGUI = function() {
 	GUI.updateFriendList();
-	//controller.updateChat();
+	controller.updateChat();
 	GUI.updateVideoElements();
+
+	if (conversation.isFree()) GUI.setExitButtonVisible(false);
+	else GUI.setExitButtonVisible(true);
+
 }
 
 controller.updateChat = function() {
@@ -28,7 +32,7 @@ controller.sendMessage = function() {
 	GUI.cleanMessageField();
 	var participants = conversation.participants
 	for (var i in participants) {
-		if (friendList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], conversation.id, message);
+		if (friendList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], "message" , message);
 	}
 	conversation.addMessage(controller.id, message);
 	controller.updateGUI();
@@ -36,12 +40,14 @@ controller.sendMessage = function() {
 
 controller.receiveMessage = function(id, msgType, message) {
 	if (controller.busy) return;
-	if (msgType === "message") {	
+	if (msgType === "message") {
+		console.log(message);
 		conversation.addMessage(id, message);
 		GUI.notification(friendList.get(id).username);
 	}
 	else if (msgType === "roomInvite") {
 		if (conversation.isFree()) {
+			console.log("received invite to join room: " + message);
 			easyrtc.joinRoom(message);
 			controller.inviteFriendToRoom(id, message);
 		}
@@ -51,9 +57,11 @@ controller.receiveMessage = function(id, msgType, message) {
 
 controller.call = function(id) {
 	var conversationId = conversation.id;
+	console.log("id now : " + conversationId);
 	if (!conversationId) {
 		conversationId = conversation.generateId();
 	}
+	console.log("id now : " + conversationId);
 	controller.inviteFriendToRoom(id, conversationId);
 }
 
@@ -75,8 +83,11 @@ controller.roomListener = function(roomName, friends) {
 	controller.updateGUI();
 }
 
-controller.signalVideoWaiting= function(id, conversationId) {
-	if (conversationId) easyrtc.sendDataWS(id, "waitForVideo", conversationId);
-	else easyrtc.sendDataWS(id, "stopWaitingForVideo");
-}
 
+
+controller.reset = function() {
+	console.log(conversation.id);
+	easyrtc.leaveRoom(conversation.id);
+	conversation.reset();
+	controller.updateGUI();
+}
