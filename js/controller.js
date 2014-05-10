@@ -40,18 +40,21 @@ controller.sendMessage = function() {
 
 controller.receiveMessage = function(id, msgType, message) {
 	if (controller.busy) return;
-	if (msgType === "message") {
-		conversation.addMessage(id, message);
-		GUI.notification(friendList.get(id).username);
-	}
-	else if (msgType === "roomInvite") {
-		if (conversation.isFree()) {
+
+	if (conversation.isFree()) {
+		if (msgType === "roomInvite") {
 			console.log("received invite to join room: " + message);
 			easyrtc.joinRoom(message);
 			controller.sendRoomInvite(id, message);
 		}
 	}
-	else controller.receiveSignal(id, msgType);
+	else {
+		if (msgType === "message" && conversation.isParticipant(id)) {
+			conversation.addMessage(id, message);
+			GUI.notification(friendList.get(id).username);
+		}
+		else controller.receiveSignal(id, msgType);
+	}
 	controller.updateGUI();
 }
 
