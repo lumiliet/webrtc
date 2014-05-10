@@ -8,13 +8,15 @@ fileTransfer.setup= function() {
 
 fileTransfer.dataChannelOpenListener = function(id){
 	console.log("Data channel established " + id);
-	friendList.get(id).data = true;
+	friendList.get(id).data.enabled = true;
+	controller.sendSignal(id, (friendList.get(controller.myId).audiovideo.audioMuted ? "disableAudio" : "enableAudio"));
+	controller.sendSignal(id, (friendList.get(controller.myId).audiovideo.videoMuted ? "disableVideo" : "enableVideo"));
 	controller.updateGUI();
 }
 
 fileTransfer.dataChannelCloseListener = function(id) {
 	console.log("Data channel closed " + id);
-	friendList.get(id).data = false;
+	friendList.get(id).data.enabled = false;
 	controller.updateGUI();
 }
 
@@ -77,7 +79,7 @@ fileTransfer.sendFiles = function(files) {
 	var fileSender;
 	var participants = conversation.participants;
 	for (var i in participants) {
-		if (friendList.get(participants[i]).data) {
+		if (friendList.get(participants[i]).data.enabled) {
 			fileSender = easyrtc_ft.buildFileSender(conversation.participants[i], fileTransfer.senderStatus);
 			fileSender(files, true);
 		}

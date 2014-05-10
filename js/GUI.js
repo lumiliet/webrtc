@@ -30,7 +30,7 @@ GUI.setup = function() {
 
 	var exitButton = document.getElementById("exitButton");
 	exitButton.onclick= function() {
-		videoCall.disconnect();
+		controller.disconnect();
 	}
 	var messageField = document.getElementById("sendMessageField");
 	messageField.onkeyup = function(e) {
@@ -41,9 +41,9 @@ GUI.setup = function() {
 
 	var chatEdge = document.getElementById("chatEdge");
 	chatEdge.onclick = function() {
-		console.log("hoho");
 		GUI.showChat(!GUI.chat);
-		GUI.chat = !GUI.chat;	
+		GUI.chat = !GUI.chat;
+		GUI.focusize();
 	}; 
 
 	var dropZone = document.getElementById('chatArea');
@@ -133,70 +133,35 @@ GUI.updateFriendList = function(friends) {
 		var glyphs = document.createElement("span");
 		glyphs.className = "friendGlyphContainer";
 
-		if (controller.friendSelectMode) {
-			glyphs.style.visibility = "visible";
+		glyphs.style.visibility = "hidden";
+		var addFriendToConversationButton = document.createElement("span");
 
-			var untickedGlyph = document.createElement("span");
+		addFriendToConversationButton.className = "glyph glyphicon glyphicon-plus";
 
-			if (controller.isFriendSelected(id)) {
-
-				untickedGlyph.className = "glyph glyphicon glyphicon-check";
+		addFriendToConversationButton.onclick = function(id) {
+			return function() {
+				controller.initiateConversation(id);
 			}
-			else {
-				untickedGlyph.className = "glyph glyphicon glyphicon-unchecked";
+		}(id);
+
+		glyphs.appendChild(addFriendToConversationButton);
+
+		friend.onmouseover = function(glyphs) {
+			return function() {
+				glyphs.style.visibility = "visible";
 			}
-			untickedGlyph.onclick = function(id) {
+		}(glyphs);
 
+		friend.onmouseout = function(glyphs) {
+			return function() {
+				glyphs.style.visibility = "hidden";
+			}
+		}(glyphs);
 
-				return function() {
-					if (this.className.indexOf("unchecked") > 0) {
-						this.className = "glyph glyphicon glyphicon-check";
-						controller.toggleFriendSelect(id);
-					}
-					else {
-						this.className = "glyph glyphicon glyphicon-unchecked";
-						controller.toggleFriendSelect(id);
-
-					}
-				}
-			}(id);
-
-
-			glyphs.appendChild(untickedGlyph);
-		}
-		else {
-			glyphs.style.visibility = "hidden";
-			var startVideoButton = document.createElement("span");
-
-			startVideoButton.className = "glyph glyphicon glyphicon-facetime-video";
-
-			startVideoButton.onclick = function(id) {
-				return function() {
-					controller.call(id);
-				}
-			}(id);
-
-
-			glyphs.appendChild(startVideoButton);
-
-
-			friend.onmouseover = function(glyphs) {
-				return function() {
-					glyphs.style.visibility = "visible";
-				}
-			}(glyphs);
-
-			friend.onmouseout = function(glyphs) {
-				return function() {
-					glyphs.style.visibility = "hidden";
-				}
-			}(glyphs);
-
-		}
-		friend.appendChild(glyphs);
-
-		friendList.appendChild(friend);
 	}
+	friend.appendChild(glyphs);
+
+	friendList.appendChild(friend);
 }
 
 GUI.generateMessageHTML = function(message) {
@@ -221,11 +186,54 @@ GUI.createVideoElement = function(id) {
 	var videoContainer = document.createElement("div");
 	var video = document.createElement("video");
 	var videoTitle = document.createElement("div");
-	videoTitle.innerHTML = (friendList.get(id) ? friendList.get(id).username : "Me");
-	videoTitle.className = "videoTitle";
-	videoContainer.id = "video_" + id;
+
+	var glyphs = document.createElement("span");
+	glyphs.className = "videoTitle";
+
+	var videoGlyph = document.createElement("span");
+	videoGlyph.className = "videoButton glyphicon glyphicon-eye-open";
+	videoGlyph.id = "videoGlyph_" + id;
+	videoGlyph.onclick = function(id) {
+		return function() {
+			if (this.className.indexOf("open") > 0) {
+				videoCall.enableVideo(id,false);
+			}
+			else {
+				videoCall.enableVideo(id,true);
+			}
+		}
+	}(id);
+
+	var audioGlyph = document.createElement("span");
+	audioGlyph.className = "videoButton glyphicon glyphicon-volume-up";
+	audioGlyph.onclick = function(id) {
+		return function() {
+			if (this.className.indexOf("up") > 0) {
+				videoCall.enableAudio(id,false);			
+			}
+			else {
+				videoCall.enableAudio(id,true);			
+			}
+		}
+	}(id);
+	audioGlyph.id = "audioGlyph_" + id;
+
+	var videoText = document.createElement("span");
+	videoText.className = "videoText";
+	videoText.innerHTML = (id === controller.myId ? "Me" : friendList.get(id).username);
+	
+	
+	glyphs.appendChild(videoText);
+	glyphs.appendChild(videoGlyph);
+	glyphs.appendChild(audioGlyph);
+
+	videoTitle.className = "videoTitleContainer";
+	videoTitle.appendChild(glyphs);
+	videoContainer.id = "videoContainer_" + id;
+	video.id = "video_" + id;
 	videoContainer.className = "videoContainer";
 	video.className = "videoElement";
+	if (id === controller.myId) video.muted = true;
 	videoContainer.appendChild(videoTitle);
 	videoContainer.appendChild(video);
 	videoArea.appendChild(videoContainer);
@@ -234,9 +242,21 @@ GUI.createVideoElement = function(id) {
 	return video;
 }
 
+GUI.setAudioGlyphStatus = function(id, status) {
+	var glyph = document.getElementById("audioGlyph_" + id);
+	if (status)	glyph.className = "videoButton glyphicon glyphicon-volume-up";
+	else glyph.className = "videoButton glyphicon glyphicon-volume-off";
+}
+
+GUI.setVideoGlyphStatus = function(id, status) {
+	var glyph = document.getElementById("videoGlyph_" + id);
+	if (status)	glyph.className = "videoButton glyphicon glyphicon-eye-open";
+	else glyph.className = "videoButton glyphicon glyphicon-eye-close";
+}
+
 GUI.deleteVideoElement = function(id) {
 	var videoArea = document.getElementById("videoArea");
-	var video = document.getElementById("video_" + id);
+	var video = document.getElementById("videoContainer_" + id);
 	if (!video) return;
 	videoArea.removeChild(video);
 	this.videoElements--;
@@ -266,9 +286,13 @@ GUI.updateVideoElements = function() {
 
 	if (elements <= 0);
 	else if (elements <= 2) width /= elements;
+	else if (elements <= 4) {
+		width /= 2; 
+		height /= 2;
+	}
 	else {
-		width /= 2;
-		height /= (Math.floor((elements - 1)/2) + 1);
+		width /= 3;
+		height /= (Math.floor((elements - 1)/3) + 1);
 	}
 	var videoContainers = document.getElementsByClassName("videoContainer");
 
@@ -295,4 +319,20 @@ GUI.showChat = function(show) {
 	
 	}
 	controller.updateChat();
+}
+
+GUI.enableVideo = function(id, enable) {
+	var videoElement = document.getElementById("video_"+ id);
+	GUI.setVideoGlyphStatus(id, enable);
+	if (enable) {
+		videoElement.style.visibility = "visible";
+	}
+	else {
+		videoElement.style.visibility = "hidden";
+	}
+}
+
+GUI.enableAudio = function(id, enable) {
+	easyrtc.muteVideoObject("video_" + id, !enable);
+	GUI.setAudioGlyphStatus(id, enable);
 }

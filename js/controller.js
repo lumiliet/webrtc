@@ -1,5 +1,5 @@
 var controller = {
-	id: "",
+	myId: "",
 	busy: true,
 }
 
@@ -32,16 +32,15 @@ controller.sendMessage = function() {
 	GUI.cleanMessageField();
 	var participants = conversation.participants
 	for (var i in participants) {
-		if (friendList.get(participants[i]).online) easyrtc.sendDataWS(participants[i], "message" , message);
+		if (friendList.get(participants[i]).online) easyrtc.sendDataP2P(participants[i], "message" , message);
 	}
-	conversation.addMessage(controller.id, message);
+	conversation.addMessage(controller.myId, message);
 	controller.updateGUI();
 }
 
 controller.receiveMessage = function(id, msgType, message) {
 	if (controller.busy) return;
 	if (msgType === "message") {
-		console.log(message);
 		conversation.addMessage(id, message);
 		GUI.notification(friendList.get(id).username);
 	}
@@ -49,23 +48,51 @@ controller.receiveMessage = function(id, msgType, message) {
 		if (conversation.isFree()) {
 			console.log("received invite to join room: " + message);
 			easyrtc.joinRoom(message);
-			controller.inviteFriendToRoom(id, message);
+			controller.sendRoomInvite(id, message);
 		}
 	}
+	else controller.receiveSignal(id, msgType);
 	controller.updateGUI();
 }
 
-controller.call = function(id) {
+controller.signalAll = function(signal) {
+	var participants = conversation.participants;
+	for (var p in participants) {
+		controller.sendSignal(participants[p], signal);
+	}
+}
+
+controller.sendSignal = function(id, signal) {
+	if (!friendList.get(id).data.enabled) return;
+	console.log("Sending " + signal + " to " + friendList.get(id).username);
+	easyrtc.sendDataP2P(id, signal, "");
+}
+
+controller.receiveSignal = function(id, signal) {
+	console.log("Received " + signal + " from " + friendList.get(id).username);
+	if (signal === "disableVideo") {
+		videoCall.enableVideo(id, false);	
+	}
+	else if (signal === "enableVideo") {
+		videoCall.enableVideo(id, true);	
+	}
+	else if (signal === "disableAudio") {
+		videoCall.enableAudio(id, false);	
+	}
+	else if (signal === "enableAudio") {
+		videoCall.enableAudio(id, true);	
+	}
+}
+
+controller.initiateConversation = function(id) {
 	var conversationId = conversation.id;
-	console.log("id now : " + conversationId);
 	if (!conversationId) {
 		conversationId = conversation.generateId();
 	}
-	console.log("id now : " + conversationId);
-	controller.inviteFriendToRoom(id, conversationId);
+	controller.sendRoomInvite(id, conversationId);
 }
 
-controller.inviteFriendToRoom = function(id, room) {
+controller.sendRoomInvite = function(id, room) {
 	easyrtc.sendDataWS(id, "roomInvite", room);
 }
 
@@ -83,11 +110,54 @@ controller.roomListener = function(roomName, friends) {
 	controller.updateGUI();
 }
 
-
-
 controller.reset = function() {
-	console.log(conversation.id);
 	easyrtc.leaveRoom(conversation.id);
 	conversation.reset();
 	controller.updateGUI();
 }
+
+controller.connect = function() {
+	var participants = conversation.participants;
+
+	for (var p in participants) {
+		controller.call(participants[p], conversation.id);
+	}
+}
+
+controller.disconnect = function(conversationId) {
+	if (!conversation.isFree()) {
+		easyrtc.hangupAll();	
+		controller.reset();
+	}
+}
+
+controller.call = function(id, conversationId) {
+	console.log("Call to "  + friendList.get(id).username);
+	if (!friendList.get(id).online) {
+		console.log("Call failed, friend no longer online");
+		return;
+	}
+	if (friendList.get(id).connection.enabled) {
+		console.log("Call to " + id + " already established");
+		return;
+	}
+	easyrtc.call(id,
+			function(otherCaller, mediaType) {
+				console.log("Call succesful - " + otherCaller + " - " + mediaType);
+			},
+			function(errorCode, errMessage) {
+				console.log("Call failed - " + errorCode + " - " + errMessage);
+			},
+			function(wasAccepted, easyrtcid) {
+				if(wasAccepted){
+					console.log("call accepted by " + easyrtc.idToName(easyrtcid));
+					friendList.get(easyrtcid).connection.enabled = true;
+				}
+				else{
+					console.log("call rejected" + easyrtc.idToName(easyrtcid));
+				}
+
+			}
+	);
+}
+

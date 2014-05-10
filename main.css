@@ -109,15 +109,29 @@ background-size: 13px, 29px, 37px, 53px;
 
 .videoElement {
 	width: 100%;
-	height: calc(100% - 20px);
+	height: calc(100% - 40px);
+}
+
+.videoTitleContainer {
+	height: 40px;
+	line-height:40px;
+	width: 100%;
+	font-size:1.2em;
+	text-align: center;
 }
 
 .videoTitle {
-	height: 20px;
-	line-height: 20px;
-	width: 100%;
-	text-align: center;
 }
+
+.videoText {
+}
+
+.videoButton {
+	margin-left: 20px;	
+	line-height: 30px;
+	cursor: pointer;
+}
+
 
 .chatMessage {
 	padding: 10px 20px 0px 20px;
@@ -183,6 +197,7 @@ background-size: 13px, 29px, 37px, 53px;
 	margin: auto;
 
 }
+
 
 .glyph {
 	font-size: 1.3em;

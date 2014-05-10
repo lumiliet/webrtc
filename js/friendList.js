@@ -6,8 +6,16 @@ friendList.newFriend = function(id) {
 	this.list[id] = {
 		id: id,
 		username: easyrtc.idToName(id),
-		audiovideo: false,
-		data: false,
+		connection: {enabled: false},
+		audiovideo: {
+			enabled: false,
+			audioMuted: false,
+			videoMuted: false,
+			stream: {}
+		},
+		data: {
+			enabled: false,
+		},
 		online: true,
 	}
 }

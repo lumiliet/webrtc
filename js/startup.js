@@ -1,6 +1,5 @@
 function start() {
 
-	conversation.reset();
 	
 	var username = location.search && location.search.split('?')[1];
 	
@@ -8,13 +7,12 @@ function start() {
 	easyrtc.enableDebug(false);
 	easyrtc.enableVideo(true);
 	easyrtc.enableVideoReceive(true);
-	easyrtc.enableAudio(false);
+	easyrtc.enableAudio(true);
 	easyrtc.enableDataChannels(true);
-	easyrtc.setPeerListener(controller.receiveMessage);
-	easyrtc.setRoomOccupantListener(controller.roomListener);
 	
 	easyrtc.connect("chat", function(id) {
-			controller.id = id;
+			controller.myId = id;
+			friendList.newFriend(id);
 		},
 		function(easyrtcid, roomOwner){
 			if( roomOwner){ console.log("I'm the room owner"); }
@@ -26,13 +24,16 @@ function start() {
 		}
 	);
 	
+	easyrtc.setPeerListener(controller.receiveMessage);
+	easyrtc.setRoomOccupantListener(controller.roomListener);
+	
 	easyrtc.setDataChannelOpenListener(fileTransfer.dataChannelOpenListener);
 	easyrtc.setDataChannelCloseListener(fileTransfer.dataChannelCloseListener);
 	
 	easyrtc.setStreamAcceptor(videoCall.acceptor);
 	easyrtc.setOnStreamClosed(videoCall.disconnectListener);
 
-
+	conversation.reset();
 	fileTransfer.setup();
 	videoCall.enableCamera();
 

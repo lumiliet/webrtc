@@ -24,18 +24,6 @@ conversation.isParticipant = function(id) {
 	return false;
 }
 
-conversation.startVideoWaiting = function(groupConversationId) {
-	console.log("Wating for group video");
-	this.waitingForGroupVideo = {
-		id: groupConversationId
-	};
-}
-
-conversation.stopVideoWaiting = function() {
-	console.log("Stopped waiting for group video");
-	this.waitingForGroupVideo = null;
-}
-
 conversation.isFree = function() {
 	if (conversation.id === "") return true;
 	return false;
@@ -49,20 +37,19 @@ conversation.reset = function() {
 }
 
 conversation.generateId = function() {
-	return controller.id + "_" + this.idCounter++;
+	return controller.myId + "_" + this.idCounter++;
 }
 
 conversation.groupConversationListener = function(id, participants) {
 	if (Object.keys(participants).length === 0 && id === this.id) {
 		this.reset();
-		console.log("Leaving room: " + id);	
 		easyrtc.leaveRoom(id);
 		return;
 	}
 
 	for (var p in participants) this.addParticipant(p);
 	if (this.id !== id) {
-		videoCall.connect();
+		controller.connect();
 		this.id = id;
 	}
 }
