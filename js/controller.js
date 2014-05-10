@@ -64,12 +64,10 @@ controller.signalAll = function(signal) {
 
 controller.sendSignal = function(id, signal) {
 	if (!friendList.get(id).data.enabled) return;
-	console.log("Sending " + signal + " to " + friendList.get(id).username);
 	easyrtc.sendDataP2P(id, signal, "");
 }
 
 controller.receiveSignal = function(id, signal) {
-	console.log("Received " + signal + " from " + friendList.get(id).username);
 	if (signal === "disableVideo") {
 		videoCall.enableVideo(id, false);	
 	}
