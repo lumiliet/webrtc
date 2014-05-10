@@ -157,11 +157,10 @@ GUI.updateFriendList = function(friends) {
 				glyphs.style.visibility = "hidden";
 			}
 		}(glyphs);
-
+		friend.appendChild(glyphs);
+		friendList.appendChild(friend);
 	}
-	friend.appendChild(glyphs);
 
-	friendList.appendChild(friend);
 }
 
 GUI.generateMessageHTML = function(message) {
