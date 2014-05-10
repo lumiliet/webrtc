@@ -27,7 +27,7 @@ controller.updateChat = function() {
 controller.sendMessage = function() {
 	var message = GUI.getTextFromMessageField();
 
-	if (!message.length || conversation.isFree()) return;
+	if (!message.length || conversation.isFree() || conversation.participants.length === 0) return;
 
 	GUI.cleanMessageField();
 	var participants = conversation.participants
@@ -122,9 +122,14 @@ controller.connect = function() {
 	}
 }
 
-controller.disconnect = function(conversationId) {
+controller.disconnect = function() {
 	if (!conversation.isFree()) {
-		easyrtc.hangupAll();	
+		var participants = conversation.participants;
+		for (var p in participants) {
+			easyrtc.hangup(participants[p]);
+			friendList.get(participants[p]).connection.enabled = false;
+		}
+
 		controller.reset();
 	}
 }

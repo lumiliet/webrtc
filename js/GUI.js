@@ -232,7 +232,10 @@ GUI.createVideoElement = function(id) {
 	video.id = "video_" + id;
 	videoContainer.className = "videoContainer";
 	video.className = "videoElement";
-	if (id === controller.myId) video.muted = true;
+	if (id === controller.myId) {
+		video.muted = true;
+		video.className += " mirror";
+	}
 	videoContainer.appendChild(videoTitle);
 	videoContainer.appendChild(video);
 	videoArea.appendChild(videoContainer);
